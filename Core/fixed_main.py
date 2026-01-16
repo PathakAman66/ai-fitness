@@ -8,6 +8,8 @@ import time
 import os
 import json
 from datetime import datetime
+from report_manager import WorkoutReportManager
+
 
 # Configuration
 CAMERA_WIDTH = 1280
@@ -74,7 +76,7 @@ class SimpleExerciseAnalyzer:
         self.exercise_type = exercise_type
         self.rep_count = 0
         self.current_stage = "start"
-
+        self.start_time = time.time()
     def calculate_angle(self, a, b, c):
         """Calculate angle between three points"""
         try:
@@ -136,6 +138,9 @@ class SimpleExerciseAnalyzer:
             return self.analyze_bicep_curl(key_points)
         else:
             return {'errors': ['Exercise type not supported'], 'rep_count': self.rep_count}
+    def get_duration(self):
+        return int(time.time() - self.start_time)
+
 
 class SimpleFitnessTrainer:
     def __init__(self):
@@ -229,12 +234,21 @@ class SimpleFitnessTrainer:
         self.cleanup()
 
     def cleanup(self):
-        """Cleanup resources"""
+        """ Cleanup resources and save workout report """
         self.is_running = False
+
+    # Save workout session
+        try:
+            WorkoutReportManager.save(self.exercise_analyzer)
+        except Exception as e:
+            print(f"⚠ Workout report not saved: {e}")
+
         if self.camera:
             self.camera.release()
+
         cv2.destroyAllWindows()
         print("👋 Application closed")
+
 
 def main():
     """Main function"""
