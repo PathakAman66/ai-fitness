@@ -1,128 +1,66 @@
 #!/usr/bin/env python3
 """
 AI Fitness Trainer - Main Entry Point
-Supports Desktop, Enhanced Desktop, Web UI, and Interactive Mode
+Updated with Web Interface Options
 """
-
 import argparse
 import sys
 import os
 import subprocess
 
-
-# -----------------------------
-# Helper function to safely run scripts
-# -----------------------------
-def run_script(script_path: str):
-    if not os.path.exists(script_path):
-        print(f"❌ Error: '{script_path}' not found.")
-        sys.exit(1)
-
-    subprocess.run([sys.executable, script_path], check=True)
-
-
-# -----------------------------
-# Run Modes
-# -----------------------------
 def run_desktop_mode():
     """Run in desktop mode with OpenCV window"""
-    print("🖥️  Starting AI Fitness Trainer in Desktop Mode...")
-    run_script("run_fitness_trainer.py")
-
+    print("Starting AI Fitness Trainer in Desktop Mode...")
+    subprocess.run([sys.executable, "run_fitness_trainer.py"])
 
 def run_enhanced_desktop():
     """Run enhanced desktop version"""
-    print("💪 Starting Enhanced AI Fitness Trainer...")
-    run_script("enhanced_trainer.py")
-
+    print("Starting Enhanced AI Fitness Trainer...")
+    subprocess.run([sys.executable, "enhanced_trainer.py"])
 
 def run_web_mode():
     """Run web interface launcher"""
-    print("🌐 Starting AI Fitness Trainer Web Interface...")
+    subprocess.run([sys.executable, "web/run_website.py"])
 
-    base_dir = os.path.dirname(os.path.abspath(__file__))
-    web_launcher = os.path.join(base_dir, "launch_web.py")
-
-    if not os.path.exists(web_launcher):
-        print(f"❌ Error: '{web_launcher}' not found.")
-        print("💡 Expected web entry file: launch_web.py at project root")
-        sys.exit(1)
-
-    subprocess.run([sys.executable, web_launcher], check=True)
-
-
-
-def run_dashboard():
-    """Run progress dashboard"""
-    print("📊 Opening Progress Dashboard...")
-    run_script("progress_dashboard.py")
-
-
-# -----------------------------
-# Interactive Menu
-# -----------------------------
-def interactive_menu():
-    print("\nAvailable Interfaces:")
-    print("1. 🖥️  Desktop App (OpenCV) - Full AI Features")
-    print("2. 💪 Enhanced Desktop - Advanced Analytics")
-    print("3. 🌐 Web Interface - Professional Website")
-    print("4. 📊 Progress Dashboard - View Your Data")
-
-    choice = input("\nEnter your choice (1-4): ").strip()
-
-    if choice == "1":
-        run_desktop_mode()
-    elif choice == "2":
-        run_enhanced_desktop()
-    elif choice == "3":
-        run_web_mode()
-    elif choice == "4":
-        run_dashboard()
-    else:
-        print("❌ Invalid choice. Exiting.")
-        sys.exit(1)
-
-
-# -----------------------------
-# Main Entry Point
-# -----------------------------
 def main():
-    parser = argparse.ArgumentParser(description="AI Fitness Trainer")
-
-    parser.add_argument(
-        "--mode",
-        choices=["desktop", "enhanced", "web", "ui"],
-        help="Run a specific interface directly"
-    )
-
-    parser.add_argument(
-        "--interactive",
-        action="store_true",
-        help="Launch interactive interface selection menu"
-    )
-
+    parser = argparse.ArgumentParser(description='AI Fitness Trainer')
+    parser.add_argument('--mode', choices=['desktop', 'enhanced', 'web', 'ui'], 
+                       default='desktop', help='Run mode')
+    
     args = parser.parse_args()
-
+    
     print("=" * 60)
-    print("🏋️ AI FITNESS TRAINER - Launcher")
+    print("🏋️ AI FITNESS TRAINER - Choose Your Interface")
     print("=" * 60)
-
-    # Interactive menu has highest priority
-    if args.interactive:
-        interactive_menu()
-        return
-
-    # Direct mode selection
-    if args.mode is None or args.mode == "desktop":
+    
+    # If no mode specified, show interactive menu
+    if args.mode == 'desktop':
         run_desktop_mode()
-    elif args.mode == "enhanced":
+    elif args.mode == 'enhanced':
         run_enhanced_desktop()
-    elif args.mode in ("web", "ui"):
+    elif args.mode == 'web' or args.mode == 'ui':
         run_web_mode()
     else:
-        print("❌ Invalid mode selected.")
-        sys.exit(1)
-
+        # Interactive mode selection
+        print("Available Interfaces:")
+        print("1. 🖥️  Desktop App (OpenCV) - Full AI Features")
+        print("2. 💪 Enhanced Desktop - Advanced Analytics")
+        print("3. 🌐 Web Interface - Professional Website")
+        print("4. 📊 Progress Dashboard - View Your Data")
+        
+        choice = input("\nEnter your choice (1-4): ").strip()
+        
+        if choice == "1":
+            run_desktop_mode()
+        elif choice == "2":
+            run_enhanced_desktop()
+        elif choice == "3":
+            run_web_mode()
+        elif choice == "4":
+            subprocess.run([sys.executable, "progress_dashboard.py"])
+        else:
+            print("Invalid choice. Running desktop mode...")
+            run_desktop_mode()
 
 if __name__ == "__main__":
     main()
