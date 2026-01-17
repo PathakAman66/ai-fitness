@@ -25,6 +25,28 @@ Supported exercise categories include:
 
 ---
 
+## 🎥 Demo
+
+### 📸 Screenshots
+
+#### 🏠 Home Page
+![Home Page](Screenshots/home.png)
+
+#### 💪 Bicep Curls Mode
+![Bicep Curls](Screenshots/bicep.png)
+
+#### 🏋️ Squats Mode
+![Squats](Screenshots/squat.png)
+
+#### 🤸 Push-ups Mode
+![Push-ups](Screenshots/pushup.png)
+
+### 🎬 GIF / Video
+(Add a GIF or video link here)
+
+
+> Tip: You can record a short demo video and upload it to YouTube/Drive and paste the link here.
+
 ## 🚀 Quick Start
 
 ### **1. Clone the Repository**
