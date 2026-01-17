@@ -329,24 +329,32 @@ class WorkoutSession:
         
     def start_session(self, exercise_type):
         self.current_session = {
-            'id': len(self.sessions) + 1,
-            'exercise': exercise_type,
-            'start_time': datetime.now().isoformat(),
-            'reps': 0,
-            'duration': 0,
-            'calories': 0
+        'id': len(self.sessions) + 1,
+        'exercise': exercise_type,
+        'start_time': datetime.now().isoformat(),
+        'start_timestamp': time.time(),  # FIX: store start timestamp
+        'reps': 0,
+        'duration': 0,
+        'calories': 0
         }
+
         
     def end_session(self, analysis_result):
-        if self.current_session:
-            self.current_session['end_time'] = datetime.now().isoformat()
-            self.current_session['reps'] = analysis_result.get('rep_count', 0)
-            self.current_session['calories'] = analysis_result.get('calories', 0)
-            self.current_session['duration'] = time.time() - self.start_time
-            self.sessions.append(self.current_session)
-            
-            # Save to file
-            self.save_sessions()
+        if not self.current_session:
+            return
+
+        self.current_session['end_time'] = datetime.now().isoformat()
+        self.current_session['reps'] = analysis_result.get('rep_count', 0)
+        self.current_session['calories'] = analysis_result.get('calories', 0)
+        self.current_session['duration'] = (
+        time.time() - self.current_session['start_timestamp']
+        )
+
+        self.sessions.append(self.current_session)
+        self.current_session = None
+
+        self.save_sessions()
+
             
     def save_sessions(self):
         try:
