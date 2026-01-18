@@ -8,10 +8,17 @@ import time
 import json
 import os
 from datetime import datetime
+import sys
+
+# Add the project root to path so we can import from utils
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
+from utils.config_loader import ConfigLoader
 
 print("🚀 Initializing Enhanced AI Fitness Trainer...")
 
 class EnhancedConfig:
+    # These can also be moved to config.yaml, but we'll keep defaults here
     CAMERA_WIDTH = 1280
     CAMERA_HEIGHT = 720
     MIN_DETECTION_CONFIDENCE = 0.7
@@ -94,7 +101,10 @@ class EnhancedExerciseAnalyzer:
         self.start_time = time.time()
         self.rep_history = []
         self.calories_burned = 0
-        print(f"✅ Enhanced analyzer for {exercise_type} initialized")
+        
+        # Initialize ConfigLoader
+        self.config = ConfigLoader()
+        print(f"✅ Enhanced analyzer for {exercise_type} initialized with dynamic config")
 
     def calculate_angle(self, a, b, c):
         try:
@@ -123,6 +133,10 @@ class EnhancedExerciseAnalyzer:
         errors = []
         warnings = []
         
+        # Load Thresholds from Config
+        down_thresh = self.config.get('exercises.curl.down_threshold', 160)
+        up_thresh = self.config.get('exercises.curl.up_threshold', 30)
+        
         shoulder = key_points.get('right_shoulder', (0, 0, 0, 0))
         elbow = key_points.get('right_elbow', (0, 0, 0, 0))
         wrist = key_points.get('right_wrist', (0, 0, 0, 0))
@@ -132,15 +146,17 @@ class EnhancedExerciseAnalyzer:
         # Enhanced rep counting with time tracking
         current_time = time.time()
         
-        if self.current_stage == "start" and elbow_angle < 80:
+        # State Machine using Dynamic Thresholds
+        if self.current_stage == "start" and elbow_angle < 80: # Initial pickup
             self.current_stage = "up"
             self.rep_start_time = current_time
-        elif self.current_stage == "up" and elbow_angle > 160:
+        
+        elif self.current_stage == "up" and elbow_angle > down_thresh: # Going down (Extension)
             self.current_stage = "down"
             self.rep_count += 1
             rep_duration = current_time - self.rep_start_time
             self.rep_history.append(rep_duration)
-            self.calories_burned += 0.5  # Approximate calories per rep
+            self.calories_burned += 0.5 
             
             feedback.append(f"💪 Rep {self.rep_count} completed! ({rep_duration:.1f}s)")
             
@@ -152,7 +168,7 @@ class EnhancedExerciseAnalyzer:
                 elif rep_duration < avg_duration * 0.5:
                     warnings.append("Speed up - don't rush the movement")
                     
-        elif self.current_stage == "down" and elbow_angle < 80:
+        elif self.current_stage == "down" and elbow_angle < up_thresh: # Going up (Flexion)
             self.current_stage = "up"
             self.rep_start_time = current_time
             
@@ -163,7 +179,7 @@ class EnhancedExerciseAnalyzer:
         elif elbow_shoulder_distance > 0.08:
             warnings.append("Elbows starting to drift out")
             
-        if elbow_angle > 170 and self.current_stage != "start":
+        if elbow_angle > (down_thresh + 10) and self.current_stage != "start":
             warnings.append("Fully extend arms for maximum range")
             
         return {
@@ -182,6 +198,10 @@ class EnhancedExerciseAnalyzer:
         errors = []
         warnings = []
         
+        # Load Thresholds
+        stand_thresh = self.config.get('exercises.squat.up_threshold', 170)
+        squat_thresh = self.config.get('exercises.squat.down_threshold', 90)
+        
         hip = key_points.get('right_hip', (0, 0, 0, 0))
         knee = key_points.get('right_knee', (0, 0, 0, 0))
         ankle = key_points.get('right_ankle', (0, 0, 0, 0))
@@ -191,23 +211,23 @@ class EnhancedExerciseAnalyzer:
         hip_angle = self.calculate_angle(shoulder, hip, knee)
         
         # Squat analysis
-        if self.current_stage == "start" and knee_angle < 150:
+        if self.current_stage == "start" and knee_angle < (stand_thresh - 10):
             self.current_stage = "down"
-        elif self.current_stage == "down" and knee_angle > 160:
+        elif self.current_stage == "down" and knee_angle > stand_thresh:
             self.current_stage = "up"
             self.rep_count += 1
-            self.calories_burned += 1.0  # More calories for squats
+            self.calories_burned += 1.0
             feedback.append(f"🦵 Squat {self.rep_count} completed!")
-        elif self.current_stage == "up" and knee_angle < 150:
+        elif self.current_stage == "up" and knee_angle < (stand_thresh - 10):
             self.current_stage = "down"
             
-        # Depth analysis
-        if knee_angle < 90:
+        # Depth analysis (Dynamic)
+        if knee_angle < squat_thresh:
             feedback.append("Great depth! 💯")
-        elif knee_angle < 110:
+        elif knee_angle < (squat_thresh + 20):
             warnings.append("Go deeper for better results")
         else:
-            errors.append("Not deep enough - aim for 90°")
+            errors.append(f"Not deep enough - aim for {squat_thresh}°")
             
         # Knee alignment
         if abs(knee[0] - ankle[0]) > 0.1:
@@ -232,6 +252,10 @@ class EnhancedExerciseAnalyzer:
         errors = []
         warnings = []
         
+        # Load Thresholds
+        up_thresh = self.config.get('exercises.shoulder_press.up_threshold', 160)
+        down_thresh = self.config.get('exercises.shoulder_press.down_threshold', 90)
+        
         shoulder = key_points.get('right_shoulder', (0, 0, 0, 0))
         elbow = key_points.get('right_elbow', (0, 0, 0, 0))
         wrist = key_points.get('right_wrist', (0, 0, 0, 0))
@@ -240,17 +264,17 @@ class EnhancedExerciseAnalyzer:
         
         if self.current_stage == "start" and elbow_angle < 100:
             self.current_stage = "up"
-        elif self.current_stage == "up" and elbow_angle > 160:
+        elif self.current_stage == "up" and elbow_angle > up_thresh:
             self.current_stage = "down"
             self.rep_count += 1
             self.calories_burned += 0.6
             feedback.append(f"💪 Shoulder Press {self.rep_count} completed!")
-        elif self.current_stage == "down" and elbow_angle < 100:
+        elif self.current_stage == "down" and elbow_angle < down_thresh:
             self.current_stage = "up"
             
         # Form checks
-        if elbow_angle < 90:
-            warnings.append("Good depth - keep elbows at 90°")
+        if elbow_angle < down_thresh:
+            warnings.append(f"Good depth - keep elbows at {down_thresh}°")
         if abs(elbow[0] - shoulder[0]) > 0.15:
             errors.append("Keep elbows in front of shoulders")
             
@@ -280,7 +304,6 @@ class EnhancedExerciseAnalyzer:
         current_time = time.time()
         plank_duration = current_time - self.start_time
         
-        # Update calories based on time (approx 3 calories per minute)
         self.calories_burned = plank_duration * (3/60)
         
         # Form checks
@@ -291,7 +314,6 @@ class EnhancedExerciseAnalyzer:
         else:
             feedback.append(f"Perfect plank form! ⏱️ {int(plank_duration)}s")
             
-        # Check hip height relative to shoulders
         if hip[1] > shoulder[1] + 0.1:
             errors.append("Hips are too low - engage core")
             
@@ -318,7 +340,9 @@ class EnhancedExerciseAnalyzer:
         elif self.exercise_type == "plank":
             return self.analyze_plank(key_points)
         elif self.exercise_type == "push_up":
-            return self.analyze_bicep_curl(key_points)  # Similar mechanics
+            # Reuse curl logic or implement specific pushup logic
+            # For now, mapping pushup thresholds if they exist in config
+            return self.analyze_bicep_curl(key_points) 
         else:
             return {'errors': ['Exercise not supported'], 'rep_count': self.rep_count}
 
@@ -332,13 +356,12 @@ class WorkoutSession:
         'id': len(self.sessions) + 1,
         'exercise': exercise_type,
         'start_time': datetime.now().isoformat(),
-        'start_timestamp': time.time(),  # FIX: store start timestamp
+        'start_timestamp': time.time(),
         'reps': 0,
         'duration': 0,
         'calories': 0
         }
 
-        
     def end_session(self, analysis_result):
         if not self.current_session:
             return
@@ -355,7 +378,6 @@ class WorkoutSession:
 
         self.save_sessions()
 
-            
     def save_sessions(self):
         try:
             os.makedirs('workout_data', exist_ok=True)
