@@ -1,0 +1,14 @@
+{
+  "session_id": "0e7a00d0-2c6e-4899-ba34-0854b5b2fa27",
+  "id": 7,
+  "exercise": "bicep_curl",
+  "exercise_type": "bicep_curl",
+  "user_id": null,
+  "start_time": "2026-01-18T22:43:07.165452",
+  "start_timestamp": 1768756387.1654727,
+  "end_time": "2026-01-18T22:43:07.171623",
+  "reps": 0,
+  "duration": 0.006168365478515625,
+  "calories": 0.0,
+  "status": "completed"
+}

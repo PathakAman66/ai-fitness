@@ -10,6 +10,7 @@ import base64
 from datetime import datetime
 from typing import Optional, Dict, Any
 import time
+from workout_history import WorkoutHistoryUI
 
 # Page Configuration
 st.set_page_config(
@@ -188,6 +189,13 @@ class APIClient:
 def main():
     st.markdown('<h1 class="main-header">🏋️ AI Fitness Trainer</h1>', unsafe_allow_html=True)
     
+    # Check if user wants to view workout history
+    if st.session_state.get('view_history', False):
+        # Render workout history UI
+        history_ui = WorkoutHistoryUI()
+        history_ui.render_history_section()
+        return
+    
     # Check backend health
     if not APIClient.check_health():
         st.error("⚠️ Backend API is not available. Please start the FastAPI server.")
@@ -215,6 +223,14 @@ def main():
                     else:
                         st.error("Failed to start session")
                 st.markdown('</div>', unsafe_allow_html=True)
+        
+        # Add "View Workout History" button
+        st.markdown("<br>", unsafe_allow_html=True)
+        col_center = st.columns([1, 2, 1])[1]
+        with col_center:
+            if st.button("📊 View Workout History", use_container_width=True, type="secondary"):
+                st.session_state.view_history = True
+                st.rerun()
 
     # --- MAIN SESSION DASHBOARD ---
     else:
@@ -232,6 +248,11 @@ def main():
                 del st.session_state.session_id
                 if 'rep_count' in st.session_state:
                     del st.session_state.rep_count
+                st.rerun()
+            
+            # Add "View Workout History" button in sidebar
+            if st.button("📊 Workout History"):
+                st.session_state.view_history = True
                 st.rerun()
             
             st.markdown("---")

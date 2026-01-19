@@ -1,0 +1,14 @@
+{
+  "session_id": "3aea0e1f-cb9e-458d-8d0d-20749f4949b5",
+  "id": 11,
+  "exercise": "squat",
+  "exercise_type": "squat",
+  "user_id": null,
+  "start_time": "2026-01-18T23:12:51.466219",
+  "start_timestamp": 1768758171.4662273,
+  "end_time": "2026-01-18T23:12:51.466239",
+  "reps": 0,
+  "duration": 1.621246337890625e-05,
+  "calories": 0.0,
+  "status": "completed"
+}
