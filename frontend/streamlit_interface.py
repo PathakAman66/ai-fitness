@@ -1,11 +1,14 @@
 """
 Web Interface for AI Fitness Trainer
+Refactored to use FastAPI backend
 """
 import streamlit as st
 import cv2
 import numpy as np
-import mediapipe as mp
+import requests
+import base64
 from datetime import datetime
+from typing import Optional, Dict, Any
 import time
 
 # Page Configuration
@@ -72,52 +75,124 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-class FitnessTrainer:
-    def __init__(self, exercise):
-        self.mp_pose = mp.solutions.pose
-        self.pose = self.mp_pose.Pose(min_detection_confidence=0.7, min_tracking_confidence=0.5)
-        self.exercise = exercise
-        self.rep_count = 0
-        self.current_stage = "start"
-        
-    def calculate_angle(self, a, b, c):
-        a, b, c = np.array(a), np.array(b), np.array(c)
-        ba, bc = a - b, c - b
-        cosine_angle = np.dot(ba, bc) / (np.linalg.norm(ba) * np.linalg.norm(bc))
-        return np.degrees(np.arccos(np.clip(cosine_angle, -1, 1)))
-    
-    def analyze_frame(self, landmarks):
-        if not landmarks: return {'rep_count': self.rep_count, 'errors': ['No pose detected']}
-        l = landmarks
-        errors = []
-        
-        # Select joints based on session type
-        if self.exercise == "Bicep Curls" or self.exercise == "Push-ups":
-            p1, p2, p3 = [l[11].x, l[11].y], [l[13].x, l[13].y], [l[15].x, l[15].y]
-        else: # Squats
-            p1, p2, p3 = [l[23].x, l[23].y], [l[25].x, l[25].y], [l[27].x, l[27].y]
+# FastAPI Backend Configuration
+API_BASE_URL = "http://localhost:8000"
 
-        angle = self.calculate_angle(p1, p2, p3)
-        
-        # Core Counting Logic
-        if self.exercise == "Bicep Curls":
-            if angle < 40: self.current_stage = "up"
-            if angle > 160 and self.current_stage == "up":
-                self.current_stage = "down"; self.rep_count += 1
-            if abs(l[13].x - l[11].x) > 0.15: errors.append("Keep elbow close to body")
-        elif self.exercise == "Squats":
-            if angle < 100: self.current_stage = "down"
-            if angle > 160 and self.current_stage == "down":
-                self.current_stage = "up"; self.rep_count += 1
-        else: # Push-ups
-            if angle < 90: self.current_stage = "down"
-            if angle > 160 and self.current_stage == "down":
-                self.current_stage = "up"; self.rep_count += 1
-                
-        return {'rep_count': self.rep_count, 'stage': self.current_stage, 'angle': angle, 'errors': errors}
+# Exercise type mapping (Streamlit display name -> API enum)
+EXERCISE_TYPE_MAP = {
+    "Bicep Curls": "bicep_curl",
+    "Squats": "squat",
+    "Push-ups": "push_up"
+}
+
+
+class APIClient:
+    """Client for communicating with FastAPI backend"""
+    
+    @staticmethod
+    def encode_frame(frame: np.ndarray) -> str:
+        """Encode frame to base64 string"""
+        _, buffer = cv2.imencode('.jpg', frame)
+        return base64.b64encode(buffer).decode('utf-8')
+    
+    @staticmethod
+    def decode_frame(base64_str: str) -> np.ndarray:
+        """Decode base64 string to frame"""
+        img_bytes = base64.b64decode(base64_str)
+        nparr = np.frombuffer(img_bytes, np.uint8)
+        return cv2.imdecode(nparr, cv2.IMREAD_COLOR)
+    
+    @staticmethod
+    def check_health() -> bool:
+        """Check if backend is available"""
+        try:
+            response = requests.get(f"{API_BASE_URL}/health", timeout=2)
+            return response.status_code == 200
+        except:
+            return False
+    
+    @staticmethod
+    def start_session(exercise_type: str) -> Optional[str]:
+        """Start a new workout session"""
+        try:
+            api_exercise_type = EXERCISE_TYPE_MAP.get(exercise_type, exercise_type)
+            response = requests.post(
+                f"{API_BASE_URL}/api/v1/sessions/start",
+                json={"exercise_type": api_exercise_type}
+            )
+            if response.status_code == 200:
+                return response.json()["session_id"]
+            return None
+        except Exception as e:
+            st.error(f"Failed to start session: {str(e)}")
+            return None
+    
+    @staticmethod
+    def end_session(session_id: str) -> Optional[Dict[str, Any]]:
+        """End a workout session"""
+        try:
+            response = requests.post(
+                f"{API_BASE_URL}/api/v1/sessions/{session_id}/end"
+            )
+            if response.status_code == 200:
+                return response.json()
+            return None
+        except Exception as e:
+            st.error(f"Failed to end session: {str(e)}")
+            return None
+    
+    @staticmethod
+    def detect_pose(frame: np.ndarray, draw_landmarks: bool = True) -> Optional[Dict[str, Any]]:
+        """Detect pose in frame"""
+        try:
+            # Encode frame
+            encoded_frame = APIClient.encode_frame(frame)
+            
+            # Send to API
+            response = requests.post(
+                f"{API_BASE_URL}/api/v1/pose/detect",
+                data={
+                    "image": encoded_frame,
+                    "draw_landmarks": str(draw_landmarks).lower()
+                }
+            )
+            
+            if response.status_code == 200:
+                return response.json()
+            return None
+        except Exception as e:
+            st.error(f"Pose detection failed: {str(e)}")
+            return None
+    
+    @staticmethod
+    def analyze_exercise(session_id: str, exercise_type: str, key_points: Dict) -> Optional[Dict[str, Any]]:
+        """Analyze exercise form"""
+        try:
+            api_exercise_type = EXERCISE_TYPE_MAP.get(exercise_type, exercise_type)
+            response = requests.post(
+                f"{API_BASE_URL}/api/v1/analyze",
+                json={
+                    "session_id": session_id,
+                    "exercise_type": api_exercise_type,
+                    "key_points": key_points
+                }
+            )
+            
+            if response.status_code == 200:
+                return response.json()
+            return None
+        except Exception as e:
+            st.error(f"Analysis failed: {str(e)}")
+            return None
 
 def main():
     st.markdown('<h1 class="main-header">🏋️ AI Fitness Trainer</h1>', unsafe_allow_html=True)
+    
+    # Check backend health
+    if not APIClient.check_health():
+        st.error("⚠️ Backend API is not available. Please start the FastAPI server.")
+        st.info("Run: `uvicorn backend.api.main:app --reload`")
+        return
 
     # --- UI COMPONENT: WORKOUT SELECTION MENU (PRE-SESSION) ---
     if 'active_exercise' not in st.session_state:
@@ -129,20 +204,36 @@ def main():
             with [col1, col2, col3][i]:
                 st.markdown('<div class="workout-card">', unsafe_allow_html=True)
                 if st.button(label, key=f"btn_{key}", use_container_width=True):
-                    st.session_state.active_exercise = key
-                    st.session_state.session_start = datetime.now()
-                    st.rerun()
+                    # Start session via API
+                    session_id = APIClient.start_session(key)
+                    if session_id:
+                        st.session_state.active_exercise = key
+                        st.session_state.session_id = session_id
+                        st.session_state.session_start = datetime.now()
+                        st.session_state.rep_count = 0
+                        st.rerun()
+                    else:
+                        st.error("Failed to start session")
                 st.markdown('</div>', unsafe_allow_html=True)
 
     # --- MAIN SESSION DASHBOARD ---
     else:
         exercise = st.session_state.active_exercise
+        session_id = st.session_state.session_id
         
         with st.sidebar:
             st.markdown(f"### ⚙️ Mode: {exercise}")
+            st.caption(f"Session: {session_id[:8]}...")
+            
             if st.button("🔄 Back to Menu"):
+                # End session via API
+                APIClient.end_session(session_id)
                 del st.session_state.active_exercise
+                del st.session_state.session_id
+                if 'rep_count' in st.session_state:
+                    del st.session_state.rep_count
                 st.rerun()
+            
             st.markdown("---")
             target_reps = st.slider("Target Reps", 5, 20, 10)
             
@@ -154,9 +245,11 @@ def main():
             st.markdown("---")
             st.markdown("### 📊 Session Stats")
             current_reps = st.session_state.get('rep_count', 0)
+            calories = st.session_state.get('calories', 0.0)
             col1, col2 = st.columns(2)
             col1.metric("Current", current_reps)
             col2.metric("Target", target_reps)
+            st.metric("Calories", f"{calories:.1f}")
 
         # Main Layout
         col_video, col_analytics = st.columns([2.5, 1.5], gap="medium")
@@ -168,35 +261,88 @@ def main():
             
             if start_camera:
                 cap = cv2.VideoCapture(0)
-                trainer = FitnessTrainer(exercise)
+                
                 while cap.isOpened() and not stop_camera:
                     ret, frame = cap.read()
-                    if not ret: break
+                    if not ret:
+                        break
                     
-                    img_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-                    res = trainer.pose.process(img_rgb)
+                    # Detect pose via API
+                    pose_result = APIClient.detect_pose(frame, draw_landmarks=True)
                     
-                    if res.pose_landmarks:
-                        mp.solutions.drawing_utils.draw_landmarks(frame, res.pose_landmarks, mp.solutions.pose.POSE_CONNECTIONS)
-                        analysis = trainer.analyze_frame(res.pose_landmarks.landmark)
-                        st.session_state.rep_count = analysis['rep_count']
+                    if pose_result and pose_result.get('detected'):
+                        key_points = pose_result.get('key_points')
                         
-                        # Overlays
-                        cv2.putText(frame, f"Reps: {analysis['rep_count']}", (50, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
+                        # Get annotated frame if available
+                        if pose_result.get('annotated_image'):
+                            frame = APIClient.decode_frame(pose_result['annotated_image'])
                         
-                        with feedback_placeholder.container():
-                            if analysis.get('errors'):
-                                for error in analysis['errors']: st.error(f"⚠️ {error}")
+                        # Analyze exercise via API
+                        analysis = APIClient.analyze_exercise(session_id, exercise, key_points)
+                        
+                        if analysis:
+                            # Update session state
+                            st.session_state.rep_count = analysis.get('rep_count', 0)
+                            st.session_state.calories = analysis.get('calories', 0.0)
+                            
+                            # Add rep count overlay
+                            cv2.putText(
+                                frame, 
+                                f"Reps: {analysis['rep_count']}", 
+                                (50, 50), 
+                                cv2.FONT_HERSHEY_SIMPLEX, 
+                                1, 
+                                (0, 255, 0), 
+                                2
+                            )
+                            
+                            # Display feedback
+                            with feedback_placeholder.container():
+                                # Show errors
+                                if analysis.get('errors'):
+                                    for error in analysis['errors']:
+                                        st.error(f"❌ {error}")
+                                
+                                # Show warnings
+                                if analysis.get('warnings'):
+                                    for warning in analysis['warnings']:
+                                        st.warning(f"⚠️ {warning}")
+                                
+                                # Show positive feedback
+                                if analysis.get('feedback'):
+                                    for fb in analysis['feedback']:
+                                        st.success(f"✅ {fb}")
+                    else:
+                        # No pose detected
+                        cv2.putText(
+                            frame, 
+                            "No pose detected", 
+                            (50, 50), 
+                            cv2.FONT_HERSHEY_SIMPLEX, 
+                            1, 
+                            (0, 0, 255), 
+                            2
+                        )
                     
+                    # Display frame
                     video_placeholder.image(frame, channels="BGR", use_column_width=True)
+                    
+                    # Small delay to prevent overwhelming the API
+                    time.sleep(0.05)
+                
                 cap.release()
 
         with col_analytics:
             st.markdown("### 📈 Workout Analytics")
             reps = st.session_state.get('rep_count', 0)
+            calories = st.session_state.get('calories', 0.0)
             progress = min(reps / target_reps, 1.0)
             st.progress(progress)
             st.metric("Completion", f"{progress*100:.1f}%")
+            
+            if progress >= 1.0:
+                st.balloons()
+                st.success("🎉 Target reached! Great job!")
 
             # --- RESTORED FORM GUIDE ---
             st.markdown("### 💡 Form Guide")
