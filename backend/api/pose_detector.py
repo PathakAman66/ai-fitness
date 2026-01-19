@@ -16,23 +16,52 @@ class EnhancedPoseDetector:
     
     def __init__(self, min_detection_confidence: float = 0.7, min_tracking_confidence: float = 0.5):
         """
-        Initialize the pose detector with MediaPipe.
+        Initialize the pose detector with MediaPipe and comprehensive error handling.
         
         Args:
             min_detection_confidence: Minimum confidence for pose detection
             min_tracking_confidence: Minimum confidence for pose tracking
         """
-        self.mp_pose = mp.solutions.pose
-        self.mp_drawing = mp.solutions.drawing_utils
-        self.pose = self.mp_pose.Pose(
-            min_detection_confidence=min_detection_confidence,
-            min_tracking_confidence=min_tracking_confidence
-        )
-        self.initialized = True
+        try:
+            # Validate confidence parameters first
+            if not (0.0 <= min_detection_confidence <= 1.0):
+                raise ValueError(f"min_detection_confidence must be between 0.0 and 1.0, got {min_detection_confidence}")
+            if not (0.0 <= min_tracking_confidence <= 1.0):
+                raise ValueError(f"min_tracking_confidence must be between 0.0 and 1.0, got {min_tracking_confidence}")
+            
+            self.mp_pose = mp.solutions.pose
+            self.mp_drawing = mp.solutions.drawing_utils
+            
+            self.pose = self.mp_pose.Pose(
+                min_detection_confidence=min_detection_confidence,
+                min_tracking_confidence=min_tracking_confidence
+            )
+            self.initialized = True
+            print("✅ Pose detector initialized successfully")
+            
+        except ValueError as value_error:
+            print(f"❌ ERROR: Invalid configuration parameters: {str(value_error)}")
+            self.initialized = False
+            raise
+            
+        except ImportError as import_error:
+            print(f"❌ ERROR: Failed to import MediaPipe: {str(import_error)}")
+            print("💡 SOLUTION: Install MediaPipe with: pip install mediapipe")
+            self.initialized = False
+            raise
+            
+        except Exception as e:
+            print(f"❌ ERROR: Failed to initialize pose detector: {str(e)}")
+            print("💡 This might indicate:")
+            print("   • MediaPipe installation issues")
+            print("   • Insufficient system resources")
+            print("   • GPU/driver compatibility problems")
+            self.initialized = False
+            raise
 
     def detect_pose(self, image: np.ndarray, draw_landmarks: bool = False) -> Tuple[Optional[any], np.ndarray]:
         """
-        Detect pose landmarks in an image.
+        Detect pose landmarks in an image with comprehensive error handling.
         
         Args:
             image: Input image as numpy array (BGR format)
@@ -43,11 +72,27 @@ class EnhancedPoseDetector:
             - landmarks: MediaPipe pose landmarks or None if no person detected
             - processed_image: Image with landmarks drawn (if draw_landmarks=True) or original
         """
+        if not self.initialized:
+            print("❌ ERROR: Pose detector not properly initialized")
+            return None, image
+            
+        if image is None or image.size == 0:
+            print("❌ ERROR: Invalid image provided to pose detector")
+            return None, image
+            
         try:
+            # Validate image format
+            if len(image.shape) != 3 or image.shape[2] != 3:
+                print("❌ ERROR: Image must be a 3-channel BGR image")
+                return None, image
+            
             # Convert BGR to RGB for MediaPipe
             image_rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
             image_rgb.flags.writeable = False
+            
+            # Process with MediaPipe
             results = self.pose.process(image_rgb)
+            
             image_rgb.flags.writeable = True
             
             # Convert back to BGR
@@ -59,17 +104,28 @@ class EnhancedPoseDetector:
                 
                 # Draw landmarks if requested
                 if draw_landmarks:
-                    self.mp_drawing.draw_landmarks(
-                        image_bgr,
-                        results.pose_landmarks,
-                        self.mp_pose.POSE_CONNECTIONS,
-                        self.mp_drawing.DrawingSpec(color=(0, 255, 0), thickness=2, circle_radius=3),
-                        self.mp_drawing.DrawingSpec(color=(255, 0, 0), thickness=2)
-                    )
+                    try:
+                        self.mp_drawing.draw_landmarks(
+                            image_bgr,
+                            results.pose_landmarks,
+                            self.mp_pose.POSE_CONNECTIONS,
+                            self.mp_drawing.DrawingSpec(color=(0, 255, 0), thickness=2, circle_radius=3),
+                            self.mp_drawing.DrawingSpec(color=(255, 0, 0), thickness=2)
+                        )
+                    except Exception as draw_error:
+                        print(f"⚠️  Warning: Failed to draw landmarks: {str(draw_error)}")
+                        # Continue without drawing landmarks
             
             return landmarks, image_bgr
+            
+        except cv2.error as cv_error:
+            print(f"❌ ERROR: OpenCV error during pose detection: {str(cv_error)}")
+            print("💡 This might indicate corrupted image data")
+            return None, image
+            
         except Exception as e:
-            # Return None for landmarks and original image on error
+            print(f"❌ ERROR: Unexpected error during pose detection: {str(e)}")
+            print("💡 This might indicate MediaPipe processing failure")
             return None, image
 
     def extract_key_points(self, landmarks) -> Optional[Dict[str, Tuple[float, float, float, float]]]:

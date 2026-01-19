@@ -37,6 +37,9 @@ class ImageProcessor:
         Raises:
             ValueError: If the base64 string is invalid or cannot be decoded
         """
+        if not base64_string or not isinstance(base64_string, str):
+            raise ValueError("Base64 string must be a non-empty string")
+        
         try:
             # Remove data URI prefix if present (e.g., "data:image/jpeg;base64,")
             if ',' in base64_string:
@@ -45,8 +48,19 @@ class ImageProcessor:
             # Remove any whitespace
             base64_string = base64_string.strip()
             
+            if not base64_string:
+                raise ValueError("Base64 string is empty after removing data URI prefix")
+            
+            # Validate base64 format (basic check)
+            import re
+            if not re.match(r'^[A-Za-z0-9+/]*={0,2}$', base64_string):
+                raise ValueError("Invalid base64 format")
+            
             # Decode base64 to bytes
             image_bytes = base64.b64decode(base64_string)
+            
+            if len(image_bytes) == 0:
+                raise ValueError("Decoded base64 data is empty")
             
             # Convert bytes to numpy array
             nparr = np.frombuffer(image_bytes, np.uint8)
@@ -55,7 +69,7 @@ class ImageProcessor:
             image = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
             
             if image is None:
-                raise ValueError("Failed to decode image - invalid image data")
+                raise ValueError("Failed to decode image - invalid image data or unsupported format")
             
             return image
             
@@ -121,6 +135,12 @@ class ImageProcessor:
         Raises:
             ValueError: If the file is invalid, too large, or unsupported format
         """
+        if not file:
+            raise ValueError("No file provided")
+        
+        if not file.filename:
+            raise ValueError("File must have a filename")
+        
         try:
             # Check file size
             contents = await file.read()
@@ -151,7 +171,7 @@ class ImageProcessor:
             image = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
             
             if image is None:
-                raise ValueError("Failed to decode uploaded image - invalid image data")
+                raise ValueError("Failed to decode uploaded image - invalid image data or unsupported format")
             
             return image
             

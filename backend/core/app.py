@@ -375,19 +375,77 @@ class EnhancedFitnessTrainer:
         self.workout_start_time = None
 
     def initialize_camera(self):
-        self.camera = cv2.VideoCapture(0)
-        if not self.camera.isOpened():
-            for i in range(1, 3):
-                self.camera = cv2.VideoCapture(i)
-                if self.camera.isOpened():
-                    break
+        """
+        Initialize camera with comprehensive error handling.
         
-        if not self.camera.isOpened():
-            return False
+        Returns:
+            bool: True if camera initialized successfully, False otherwise
+        """
+        try:
+            # Try default camera (index 0)
+            print("🔍 Attempting to initialize camera (index 0)...")
+            self.camera = cv2.VideoCapture(0)
             
-        self.camera.set(cv2.CAP_PROP_FRAME_WIDTH, EnhancedConfig.CAMERA_WIDTH)
-        self.camera.set(cv2.CAP_PROP_FRAME_HEIGHT, EnhancedConfig.CAMERA_HEIGHT)
-        return True
+            if not self.camera.isOpened():
+                print("⚠️  Default camera (index 0) not available. Trying alternative cameras...")
+                
+                # Try alternative camera indices
+                for i in range(1, 5):  # Try indices 1-4
+                    print(f"🔍 Trying camera index {i}...")
+                    self.camera = cv2.VideoCapture(i)
+                    if self.camera.isOpened():
+                        print(f"✅ Camera initialized successfully on index {i}")
+                        break
+                
+            if not self.camera.isOpened():
+                print("❌ ERROR: No camera devices found!")
+                print("💡 TROUBLESHOOTING TIPS:")
+                print("   • Ensure your webcam is connected and not in use by another application")
+                print("   • Try closing other video applications (Zoom, Skype, etc.)")
+                print("   • Check camera permissions in your system settings")
+                print("   • On Windows: Check Device Manager for camera status")
+                print("   • On Linux/Mac: Check /dev/video* devices")
+                print("   • Try restarting your computer")
+                print("   • For external webcams, ensure proper drivers are installed")
+                return False
+            
+            # Test camera by reading a frame
+            ret, test_frame = self.camera.read()
+            if not ret or test_frame is None:
+                print("❌ ERROR: Camera initialized but cannot capture frames!")
+                print("💡 This might indicate:")
+                print("   • Camera hardware issue")
+                print("   • Driver problems")
+                print("   • Insufficient camera permissions")
+                self.camera.release()
+                self.camera = None
+                return False
+            
+            # Set camera properties with error checking
+            success_width = self.camera.set(cv2.CAP_PROP_FRAME_WIDTH, EnhancedConfig.CAMERA_WIDTH)
+            success_height = self.camera.set(cv2.CAP_PROP_FRAME_HEIGHT, EnhancedConfig.CAMERA_HEIGHT)
+            
+            if not success_width or not success_height:
+                print("⚠️  Warning: Could not set preferred camera resolution")
+                print(f"   Requested: {EnhancedConfig.CAMERA_WIDTH}x{EnhancedConfig.CAMERA_HEIGHT}")
+                # Get actual resolution
+                actual_width = self.camera.get(cv2.CAP_PROP_FRAME_WIDTH)
+                actual_height = self.camera.get(cv2.CAP_PROP_FRAME_HEIGHT)
+                print(f"   Using: {actual_width}x{actual_height}")
+            
+            print("✅ Camera initialized successfully!")
+            return True
+            
+        except Exception as e:
+            print(f"❌ ERROR: Unexpected error during camera initialization: {str(e)}")
+            print("💡 This might be due to:")
+            print("   • Missing OpenCV installation")
+            print("   • Corrupted camera drivers")
+            print("   • System permission issues")
+            if self.camera:
+                self.camera.release()
+            self.camera = None
+            return False
 
     def draw_enhanced_overlay(self, frame, analysis_result, exercise_type):
         h, w = frame.shape[:2]
@@ -501,7 +559,15 @@ class EnhancedFitnessTrainer:
 
     def run(self):
         if not self.initialize_camera():
-            print("❌ Error: Could not access camera")
+            print("❌ CRITICAL ERROR: Camera initialization failed!")
+            print("🚫 The application cannot continue without camera access.")
+            print("\n🔧 IMMEDIATE ACTION REQUIRED:")
+            print("   1. Check if your webcam is properly connected")
+            print("   2. Close any other applications using the camera")
+            print("   3. Restart the application")
+            print("   4. If issues persist, check camera drivers and permissions")
+            print("\n💡 ALTERNATIVE: Use the web interface instead:")
+            print("   Run: streamlit run frontend/streamlit_interface.py")
             return
             
         print("✅ Enhanced camera initialized")
@@ -514,12 +580,30 @@ class EnhancedFitnessTrainer:
         
         self.is_running = True
         in_menu = True
+        frame_read_failures = 0
+        max_frame_failures = 10
         
         while self.is_running:
             ret, frame = self.camera.read()
             if not ret:
-                print("❌ Failed to capture frame")
-                break
+                frame_read_failures += 1
+                print(f"⚠️  Frame capture failed (attempt {frame_read_failures}/{max_frame_failures})")
+                
+                if frame_read_failures >= max_frame_failures:
+                    print("❌ ERROR: Too many frame capture failures!")
+                    print("💡 This might indicate:")
+                    print("   • Camera disconnected during use")
+                    print("   • Camera hardware failure")
+                    print("   • Driver issues")
+                    print("   • System resource constraints")
+                    break
+                
+                # Brief pause before retry
+                time.sleep(0.1)
+                continue
+            
+            # Reset failure counter on successful read
+            frame_read_failures = 0
                 
             if in_menu:
                 frame = self.show_enhanced_menu(frame)

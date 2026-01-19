@@ -53,13 +53,57 @@ class TestEnhancedPoseDetector:
         
         assert key_points is None
     
-    def test_detect_pose_with_draw_landmarks_false(self):
-        """Test that draw_landmarks=False doesn't modify image significantly"""
+    def test_detect_pose_with_invalid_image_none(self):
+        """Test pose detection with None image returns None landmarks"""
         detector = EnhancedPoseDetector()
         
-        test_image = np.random.randint(0, 255, (480, 640, 3), dtype=np.uint8)
+        landmarks, processed_image = detector.detect_pose(None)
         
-        landmarks, processed_image = detector.detect_pose(test_image, draw_landmarks=False)
+        assert landmarks is None
+        assert processed_image is None
+    
+    def test_detect_pose_with_invalid_image_empty(self):
+        """Test pose detection with empty image array"""
+        detector = EnhancedPoseDetector()
         
-        # Image should be processed but not have landmarks drawn
+        empty_image = np.array([])
+        
+        landmarks, processed_image = detector.detect_pose(empty_image)
+        
+        assert landmarks is None
         assert processed_image is not None
+        assert processed_image.shape == empty_image.shape
+    
+    def test_detect_pose_with_wrong_channels(self):
+        """Test pose detection with image that doesn't have 3 channels"""
+        detector = EnhancedPoseDetector()
+        
+        # Create grayscale image (1 channel)
+        gray_image = np.random.randint(0, 255, (480, 640), dtype=np.uint8)
+        
+        landmarks, processed_image = detector.detect_pose(gray_image)
+        
+        assert landmarks is None
+        assert processed_image is not None
+        assert processed_image.shape == gray_image.shape
+    
+    def test_detect_pose_with_wrong_dimensions(self):
+        """Test pose detection with image that has wrong number of dimensions"""
+        detector = EnhancedPoseDetector()
+        
+        # Create 2D array instead of 3D
+        wrong_dim_image = np.random.randint(0, 255, (480, 640), dtype=np.uint8)
+        
+        landmarks, processed_image = detector.detect_pose(wrong_dim_image)
+        
+        assert landmarks is None
+        assert processed_image is not None
+        assert processed_image.shape == wrong_dim_image.shape
+    
+    def test_initialization_with_invalid_confidence(self):
+        """Test that initialization fails with invalid confidence values"""
+        with pytest.raises(ValueError, match="min_detection_confidence must be between 0.0 and 1.0"):
+            EnhancedPoseDetector(min_detection_confidence=1.5)
+        
+        with pytest.raises(ValueError, match="min_tracking_confidence must be between 0.0 and 1.0"):
+            EnhancedPoseDetector(min_tracking_confidence=-0.1)
