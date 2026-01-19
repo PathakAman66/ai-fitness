@@ -1,12 +1,17 @@
 # AI Fitness Trainer with Real-Time Pose Estimation
 
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
+[![OpenCV](https://img.shields.io/badge/OpenCV-4.5+-green.svg)](https://opencv.org/)
+[![MediaPipe](https://img.shields.io/badge/MediaPipe-0.8+-orange.svg)](https://mediapipe.dev/)
+[![Streamlit](https://img.shields.io/badge/Streamlit-1.0+-red.svg)](https://streamlit.io/)
+[![FastAPI](https://img.shields.io/badge/FastAPI-0.68+-purple.svg)](https://fastapi.tiangolo.com/)
+
 An intelligent computer vision application that leverages **MediaPipe** and **OpenCV** to analyze human exercise form in real-time. This system provides live feedback, repetition counting, form correction, and workout session tracking, making fitness training more accessible and data-driven.
 
 Designed with modularity and extensibility in mind, this project serves as a comprehensive resource for developers, students, and researchers interested in the intersection of AI, computer vision, and fitness technology.
 
----
-
-## Key Features
+## 🚀 Key Features
 
 * **Real-time Pose Detection:** Utilizes MediaPipe to track 33 body landmarks with high precision.
 * **Exercise Form Analysis:** Calculates joint angles to validate posture and movement quality.
@@ -16,6 +21,8 @@ Designed with modularity and extensibility in mind, this project serves as a com
 * **Data Persistence:** Workout sessions are automatically serialized and stored in JSON format for historical analysis.
 * **Dual Interfaces:** Includes both a lightweight Desktop OpenCV interface and a web-based Streamlit dashboard.
 * **Resource Efficient:** Optimized for CPU performance; no dedicated GPU is required.
+* **RESTful API:** FastAPI-based backend for integration with web/mobile apps.
+* **Extensible Architecture:** Modular design for easy addition of new exercises and features.
 
 ### Supported Exercises
 
@@ -28,9 +35,40 @@ The system currently supports analysis for the following exercises, each with de
 * **Lunges:** Validation of lower body stability and knee angles.
 * **Plank:** Monitoring of core stability and spinal alignment (Time-based).
 
----
+## 🏗️ Architecture
 
-## System Overview
+```mermaid
+graph TD
+%% Services
+svcazurecontainerapps_backend["`Name: backend
+Path: backend
+Language: python
+Port: 8000`"]
+svcazurecontainerapps_frontend["`Name: frontend
+Path: frontend
+Language: python
+Port: 8501`"]
+subgraph "Compute Resources"
+%% Resources
+subgraph containerappenv["Azure Container Apps (ACA) Environment"]
+azurecontainerapps_backend("`backend (Azure Container App)`")
+azurecontainerapps_frontend("`frontend (Azure Container App)`")
+end
+containerappenv:::cluster
+end
+subgraph "Dependency Resources"
+%% Dependency Resources
+azurestorageaccount_storage["`storage (Azure Storage Account)`"]
+end
+%% Relationships
+svcazurecontainerapps_backend --> |"hosted on"| azurecontainerapps_backend
+azurecontainerapps_backend -.-> |"http"| azurecontainerapps_frontend
+azurecontainerapps_backend -.-> |"secret"| azurestorageaccount_storage
+svcazurecontainerapps_frontend --> |"hosted on"| azurecontainerapps_frontend
+azurecontainerapps_frontend -.-> |"http"| azurecontainerapps_backend
+```
+
+### System Overview
 
 1. **Pose Detection:** Captures the live video feed and maps 33 distinct landmarks on the human body.
 2. **Movement Analysis:** Computes the geometric angles between specific joints to determine body state.
@@ -38,18 +76,22 @@ The system currently supports analysis for the following exercises, each with de
 4. **Progress Tracking:** Manages state machines for repetition counting and calculates caloric burn.
 5. **Data Persistence:** Aggregates session statistics and saves them for long-term progress tracking.
 
----
-
-## Target Audience
+## 🎯 Target Audience
 
 * **Developers:** Those exploring real-time computer vision applications.
 * **Students:** Individuals studying AI, kinematics, or software engineering.
 * **Contributors:** Open-source enthusiasts looking for a modular codebase to extend.
 * **Fitness Enthusiasts:** Users seeking objective analysis of their workout form.
 
----
+## 📸 Screenshots
 
-## Quick Start
+### Desktop Application
+![Desktop Interface](frontend/assets/screenshots/desktop_app.png)
+
+### Web Dashboard
+![Streamlit Dashboard](frontend/assets/screenshots/streamlit_dashboard.png)
+
+## 🛠️ Quick Start
 
 ### Prerequisites
 
@@ -63,9 +105,7 @@ The system currently supports analysis for the following exercises, each with de
 ```bash
 git clone https://github.com/PathakAman66/ai-fitness-trainer.git
 cd ai-fitness-trainer
-
 ```
-
 
 2. **Install Dependencies**
 ```bash
@@ -73,23 +113,16 @@ cd ai-fitness-trainer
 pip install -r config/requirements.txt
 
 # Manual installation
-pip install mediapipe opencv-python numpy streamlit matplotlib
-
+pip install mediapipe opencv-python numpy streamlit matplotlib fastapi uvicorn
 ```
-
 
 3. **Verify Setup**
 Run the simple test script to ensure the camera and libraries are functioning correctly.
 ```bash
-python3 backend/tests/dependency_test.py
-
+python backend/tests/dependencies_test.py
 ```
 
-
-
----
-
-## Usage Guide
+## 📖 Usage Guide
 
 ### Option A: Desktop Application
 
@@ -97,7 +130,7 @@ This version runs locally using OpenCV windows and offers the best performance.
 
 ```bash
 # Launch the desktop application (6 exercises + analytics)
-python3 backend/core/app.py
+python backend/core/app.py
 ```
 
 ### Option B: FastAPI REST API
@@ -106,7 +139,7 @@ Run the backend API server for web/mobile applications.
 
 ```bash
 # Start the API server
-python3 -m backend.api.main
+python -m backend.api.main
 
 # Or using uvicorn directly
 uvicorn backend.api.main:app --reload --host 0.0.0.0 --port 8000
@@ -125,9 +158,20 @@ streamlit run frontend/streamlit_interface.py
 
 *Access the interface at: `http://localhost:8501`*
 
----
+## 📋 API Reference
 
-## Technical Details
+### Endpoints
+
+- `GET /` - Health check
+- `POST /analyze-pose` - Analyze pose from image data
+- `GET /exercises` - List supported exercises
+- `POST /start-session` - Start a workout session
+- `POST /end-session` - End a workout session
+- `GET /session/{session_id}` - Get session details
+
+For detailed API documentation, visit `http://localhost:8000/docs` when the server is running.
+
+## 🔧 Technical Details
 
 ### Exercise Detection Logic
 
@@ -142,7 +186,7 @@ streamlit run frontend/streamlit_interface.py
 
 ### Project Structure
 
-```text
+```
 ai-fitness-trainer/
 │
 ├── backend/                   # Backend Components
@@ -168,6 +212,7 @@ ai-fitness-trainer/
 │
 ├── frontend/                  # User Interfaces
 │   ├── streamlit_interface.py # Streamlit web dashboard
+│   ├── progress_dashboard.py  # Progress visualization
 │   ├── web-interface/         # HTML/CSS landing pages
 │   └── assets/                # Images and static resources
 │
@@ -175,51 +220,79 @@ ai-fitness-trainer/
 │   └── requirements.txt       # Python dependencies
 │
 └── docs/                      # Documentation
-    ├── CONTRIBUTING.md
-    ├── CODE_OF_CONDUCT.md
-    └── architecture.md
+    ├── architecture.md        # Detailed architecture docs
+    ├── CONTRIBUTING.md        # Contribution guidelines
+    └── CODE_OF_CONDUCT.md     # Code of conduct
 ```
 
----
+## 🧪 Testing
 
-## Extending the System
+Run the test suite to ensure everything is working correctly:
 
-The codebase is designed to be modular. To add a new exercise:
+```bash
+# Run all tests
+python -m pytest backend/tests/
 
-1. **Define Logic:** Create a new analysis function in `Core/main.py`.
-```python
-def analyze_new_exercise(self, key_points):
-    # Extract coordinates
-    shoulder = key_points.get('right_shoulder')
-    # Calculate angles
-    # Return stage and counter
-
+# Run specific test
+python backend/tests/test_pose_detector.py
 ```
 
+## 🚀 Deployment
 
-2. **Register Exercise:** Add the new key-value pair to the `EXERCISES` dictionary.
-3. **Update UI:** Ensure the new exercise appears in the selection menu.
+### Docker
 
----
+Build and run with Docker:
 
-## Contributing
+```bash
+# Build the image
+docker build -t ai-fitness-trainer .
 
-Contributions are welcome. Please refer to `docs/CONTRIBUTING.md`  and for detailed guidelines. We are specifically looking for:
+# Run the container
+docker run -p 8000:8000 -p 8501:8501 ai-fitness-trainer
+```
+
+### Azure Deployment
+
+The application can be deployed to Azure using Azure Container Apps for both backend and frontend services, with Azure Storage for data persistence.
+
+## 🤝 Contributing
+
+Contributions are welcome! Please see our [Contributing Guide](docs/CONTRIBUTING.md) for detailed guidelines.
+
+We are specifically looking for:
 
 * **New Exercise Modules:** Logic for additional exercises.
 * **Algorithm Optimization:** Improving the accuracy of pose detection.
 * **UI/UX Improvements:** Enhancements to the Streamlit dashboard.
 * **Analytics:** Advanced data visualization for workout history.
+* **Mobile App:** React Native or Flutter integration.
 
-### Workflow
+### Development Workflow
 
 1. Fork the repository.
 2. Create a feature branch (`git checkout -b feature/NewFeature`).
 3. Commit changes and ensure tests pass.
 4. Submit a Pull Request.
 
+## 📄 License
+
+This project is open-source and licensed under the **MIT License**. See the [LICENSE](LICENSE) file for details.
+
+## 🙏 Acknowledgments
+
+* [MediaPipe](https://mediapipe.dev/) for pose estimation
+* [OpenCV](https://opencv.org/) for computer vision
+* [Streamlit](https://streamlit.io/) for web interface
+* [FastAPI](https://fastapi.tiangolo.com/) for API framework
+
+## 📞 Support
+
+If you have any questions or need help, please:
+
+* Open an issue on GitHub
+* Check the [documentation](docs/)
+* Join our community discussions
+
 ---
 
-## License
-
-This project is open-source and licensed under the **MIT License**.
+*Made with ❤️ for the fitness and AI community*
