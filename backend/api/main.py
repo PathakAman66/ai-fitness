@@ -2,7 +2,7 @@
 FastAPI Backend for AI Fitness Trainer
 Exposes pose detection, exercise analysis, and workout session management via REST API
 """
-from fastapi import FastAPI, HTTPException, UploadFile, File, Form
+from fastapi import FastAPI, HTTPException, UploadFile, File, Form, Path, Depends, Query
 from fastapi.middleware.cors import CORSMiddleware
 from typing import Optional
 import logging
@@ -23,7 +23,8 @@ from backend.api.models import (
     ErrorResponse,
     ExerciseType,
     SessionStatus,
-    ExerciseStage
+    ExerciseStage,
+    validate_uuid_format
 )
 
 # Import services and utilities
@@ -73,6 +74,28 @@ logger.info("FastAPI application initialized with CORS support")
 pose_detector: Optional[EnhancedPoseDetector] = None
 session_manager: Optional[SessionManager] = None
 pose_detector_initialized = False
+
+
+def validate_session_id(session_id: str = Path(..., description="UUID of the workout session")) -> str:
+    """
+    Dependency to validate session ID format.
+    
+    Args:
+        session_id: Session ID string from path parameter
+        
+    Returns:
+        str: Validated session ID
+        
+    Raises:
+        HTTPException: 400 if session ID format is invalid
+    """
+    try:
+        return validate_uuid_format(session_id, "session_id")
+    except ValueError as e:
+        raise HTTPException(
+            status_code=400,
+            detail=str(e)
+        )
 
 
 # ============================================================================
@@ -327,9 +350,9 @@ async def get_exercises():
 
 @app.post("/api/v1/pose/detect", response_model=PoseDetectionResponse, tags=["Pose Detection"])
 async def detect_pose(
-    image: Optional[str] = Form(None),
-    draw_landmarks: bool = Form(False),
-    file: Optional[UploadFile] = File(None)
+    image: Optional[str] = Form(None, description="Base64 encoded image string"),
+    draw_landmarks: bool = Form(False, description="Whether to return annotated image with landmarks"),
+    file: Optional[UploadFile] = File(None, description="Uploaded image file")
 ):
     """
     Detect pose landmarks in an image.
@@ -359,18 +382,49 @@ async def detect_pose(
         HTTPException: 400 if image data is invalid or missing
         HTTPException: 503 if pose detector is not initialized
     """
+    # Validate input parameters
+    if not image and not file:
+        raise HTTPException(
+            status_code=400,
+            detail="Either 'image' (base64 string) or 'file' (multipart upload) must be provided"
+        )
+    
+    if image and file:
+        raise HTTPException(
+            status_code=400,
+            detail="Provide either 'image' or 'file', not both"
+        )
+    
+    # Validate base64 image if provided
+    if image:
+        if not isinstance(image, str) or len(image.strip()) == 0:
+            raise HTTPException(
+                status_code=400,
+                detail="Image data cannot be empty"
+            )
+    
+    # Validate file upload if provided
+    if file:
+        if not file.filename:
+            raise HTTPException(
+                status_code=400,
+                detail="Uploaded file must have a filename"
+            )
+        
+        # Check file extension
+        allowed_extensions = {'.jpg', '.jpeg', '.png', '.bmp', '.webp'}
+        file_ext = '.' + file.filename.rsplit('.', 1)[-1].lower() if '.' in file.filename else ''
+        if file_ext and file_ext not in allowed_extensions:
+            raise HTTPException(
+                status_code=400,
+                detail=f"Unsupported file format: {file_ext}. Supported formats: {', '.join(allowed_extensions)}"
+            )
+    
     # Check if pose detector is initialized
     if not pose_detector_initialized or pose_detector is None:
         raise HTTPException(
             status_code=503,
             detail="Pose detector not initialized. Service unavailable."
-        )
-    
-    # Validate that at least one image source is provided
-    if not image and not file:
-        raise HTTPException(
-            status_code=400,
-            detail="Either 'image' (base64 string) or 'file' (multipart upload) must be provided"
         )
     
     try:
@@ -606,7 +660,7 @@ async def start_session(request: SessionStartRequest):
 
 
 @app.post("/api/v1/sessions/{session_id}/end", response_model=SessionResponse, tags=["Session Management"])
-async def end_session(session_id: str):
+async def end_session(session_id: str = Depends(validate_session_id)):
     """
     End an active workout session.
     
@@ -672,7 +726,7 @@ async def end_session(session_id: str):
 
 
 @app.post("/api/v1/sessions/{session_id}/reset", response_model=SessionResetResponse, tags=["Session Management"])
-async def reset_session(session_id: str):
+async def reset_session(session_id: str = Depends(validate_session_id)):
     """
     Reset a session's state to initial values.
     
@@ -718,8 +772,8 @@ async def reset_session(session_id: str):
 @app.get("/api/v1/sessions", response_model=SessionListResponse, tags=["Session Management"])
 async def get_sessions(
     user_id: Optional[str] = None,
-    limit: int = 100,
-    offset: int = 0
+    limit: int = Query(100, ge=1, le=1000, description="Maximum number of sessions to return"),
+    offset: int = Query(0, ge=0, description="Number of sessions to skip for pagination")
 ):
     """
     Get list of workout sessions with optional filtering and pagination.
@@ -731,7 +785,7 @@ async def get_sessions(
     
     Args:
         user_id: Optional user ID to filter sessions
-        limit: Maximum number of sessions to return (default: 100)
+        limit: Maximum number of sessions to return (default: 100, max: 1000)
         offset: Number of sessions to skip for pagination (default: 0)
     
     Returns:
@@ -798,7 +852,7 @@ async def get_sessions(
 
 
 @app.get("/api/v1/sessions/{session_id}", response_model=SessionResponse, tags=["Session Management"])
-async def get_session(session_id: str):
+async def get_session(session_id: str = Depends(validate_session_id)):
     """
     Get details of a specific workout session.
     

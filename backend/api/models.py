@@ -2,10 +2,19 @@
 Pydantic data models for FastAPI Fitness Backend
 Defines request/response schemas for all API endpoints
 """
-from pydantic import BaseModel, Field, field_validator
+from pydantic import BaseModel, Field, field_validator, model_validator
 from typing import Optional, Dict, List
 from uuid import UUID
 from enum import Enum
+
+
+def validate_uuid_format(v: str, field_name: str = "session_id") -> str:
+    """Validate UUID format for session IDs"""
+    try:
+        UUID(v)
+    except ValueError:
+        raise ValueError(f"{field_name} must be a valid UUID format")
+    return v
 
 
 # Enums for validation
@@ -37,16 +46,24 @@ class ExerciseStage(str, Enum):
 # Pose Detection Models
 class PoseDetectionRequest(BaseModel):
     """Request model for pose detection endpoint"""
-    image: str = Field(..., description="Base64 encoded image string")
+    image: Optional[str] = Field(default=None, description="Base64 encoded image string")
     draw_landmarks: bool = Field(default=False, description="Whether to return annotated image with landmarks")
 
     @field_validator('image')
     @classmethod
-    def validate_image(cls, v: str) -> str:
-        """Validate that image string is not empty"""
-        if not v or len(v.strip()) == 0:
+    def validate_image(cls, v: Optional[str]) -> Optional[str]:
+        """Validate that image string is not empty if provided"""
+        if v is not None and len(v.strip()) == 0:
             raise ValueError("Image data cannot be empty")
         return v
+
+    @model_validator(mode='after')
+    def validate_image_source(self) -> 'PoseDetectionRequest':
+        """Ensure at least one image source is provided"""
+        if not self.image:
+            # This will be validated at the endpoint level since we also accept file uploads
+            pass
+        return self
 
 
 class PoseDetectionResponse(BaseModel):
@@ -83,14 +100,23 @@ class AnalysisRequest(BaseModel):
     @field_validator('key_points')
     @classmethod
     def validate_key_points(cls, v: Dict[str, List[float]]) -> Dict[str, List[float]]:
-        """Validate key points structure"""
+        """Validate key points structure and coordinate ranges"""
         if not v:
             raise ValueError("key_points cannot be empty")
         
-        # Validate that each key point has 4 values [x, y, z, visibility]
+        # Validate that each key point has exactly 4 values [x, y, z, visibility]
         for joint, coords in v.items():
             if not isinstance(coords, list) or len(coords) != 4:
-                raise ValueError(f"Each key point must have exactly 4 values [x, y, z, visibility], got {len(coords)} for {joint}")
+                raise ValueError(f"Each key point must have exactly 4 values [x, y, z, visibility], got {len(coords) if isinstance(coords, list) else 'non-list'} for {joint}")
+            
+            # Validate coordinate types and ranges
+            x, y, z, visibility = coords
+            if not all(isinstance(coord, (int, float)) for coord in [x, y, z, visibility]):
+                raise ValueError(f"All coordinates must be numbers for {joint}")
+            
+            # Validate visibility is between 0 and 1
+            if not (0.0 <= visibility <= 1.0):
+                raise ValueError(f"Visibility must be between 0.0 and 1.0 for {joint}, got {visibility}")
         
         return v
 
