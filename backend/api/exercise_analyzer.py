@@ -8,7 +8,7 @@ import mediapipe as mp
 import numpy as np
 import logging
 import threading
-from typing import Optional, Dict, Tuple
+from typing import Optional, Dict, Tuple, List
 
 logger = logging.getLogger("pose")
 
@@ -30,7 +30,7 @@ class EnhancedPoseDetector:
         )
 
         self.lock = threading.Lock()
-        self.prev_landmarks = None
+        self.prev_landmarks: Optional[List[Tuple[float, float, float, float]]] = None
         self.alpha = 0.6  # EMA smoothing
 
         logger.info("EnhancedPoseDetector initialized")
@@ -47,17 +47,23 @@ class EnhancedPoseDetector:
         return image
 
     def _smooth(self, landmarks):
-        if self.prev_landmarks is None:
-            self.prev_landmarks = landmarks
-            return landmarks
+        current = [
+            (lm.x, lm.y, lm.z, lm.visibility if lm.visibility is not None else 1.0)
+            for lm in landmarks
+        ]
+
+        if self.prev_landmarks is None or len(self.prev_landmarks) != len(current):
+            self.prev_landmarks = current
+            return current
 
         smoothed = []
-        for p, c in zip(self.prev_landmarks, landmarks):
-            x = self.alpha * c.x + (1 - self.alpha) * p.x
-            y = self.alpha * c.y + (1 - self.alpha) * p.y
-            z = self.alpha * c.z + (1 - self.alpha) * p.z
-            v = self.alpha * c.visibility + (1 - self.alpha) * p.visibility
-            smoothed.append(type(c)(x=x, y=y, z=z, visibility=v))
+        for p, c in zip(self.prev_landmarks, current):
+            smoothed.append((
+                self.alpha * c[0] + (1 - self.alpha) * p[0],
+                self.alpha * c[1] + (1 - self.alpha) * p[1],
+                self.alpha * c[2] + (1 - self.alpha) * p[2],
+                self.alpha * c[3] + (1 - self.alpha) * p[3],
+            ))
 
         self.prev_landmarks = smoothed
         return smoothed
@@ -81,16 +87,16 @@ class EnhancedPoseDetector:
         with self.lock:
             results = self.pose.process(rgb)
 
-        landmarks = None
-        if results.pose_landmarks:
-            landmarks = self._smooth(results.pose_landmarks.landmark)
+            landmarks = None
+            if results.pose_landmarks:
+                landmarks = self._smooth(results.pose_landmarks.landmark)
 
-            if draw_landmarks:
-                self.mp_drawing.draw_landmarks(
-                    image,
-                    results.pose_landmarks,
-                    self.mp_pose.POSE_CONNECTIONS
-                )
+                if draw_landmarks:
+                    self.mp_drawing.draw_landmarks(
+                        image,
+                        results.pose_landmarks,
+                        self.mp_pose.POSE_CONNECTIONS
+                    )
 
         return landmarks, image
 
@@ -114,8 +120,8 @@ class EnhancedPoseDetector:
 
         keypoints = {}
         for name, i in idx.items():
-            lm = landmarks[i]
-            keypoints[name] = (lm.x, lm.y, lm.z, lm.visibility)
+            x, y, z, v = landmarks[i]
+            keypoints[name] = (x, y, z, v)
 
         return keypoints
 
