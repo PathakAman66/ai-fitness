@@ -12,23 +12,17 @@ import logging
 logger = logging.getLogger(__name__)
 
 
+# -----------------------------
+# Core Data Models
+# -----------------------------
+
 @dataclass
 class ThresholdConfig:
-    """Configuration for pose quality thresholds.
-    
-    Attributes:
-        poor_threshold: Score below this indicates poor form (default: 60.0)
-        good_threshold: Score at or above this indicates excellent form (default: 85.0)
-    """
+    """Configuration for pose quality thresholds."""
     poor_threshold: float = 60.0
     good_threshold: float = 85.0
-    
+
     def validate(self) -> bool:
-        """Validate that poor_threshold < good_threshold.
-        
-        Returns:
-            True if configuration is valid, False otherwise
-        """
         if self.poor_threshold >= self.good_threshold:
             logger.error(
                 f"Invalid threshold configuration: poor_threshold ({self.poor_threshold}) "
@@ -40,13 +34,7 @@ class ThresholdConfig:
 
 @dataclass
 class MetricWeight:
-    """Weight configuration for a form metric.
-    
-    Attributes:
-        name: Name of the form metric
-        weight: Weight value (0.0 to 1.0) for this metric
-        is_critical: Whether this is a safety-critical metric (gets 1.5x multiplier)
-    """
+    """Weight configuration for a form metric."""
     name: str
     weight: float
     is_critical: bool
@@ -54,42 +42,62 @@ class MetricWeight:
 
 @dataclass
 class ExerciseConfig:
-    """Complete configuration for an exercise type.
-    
-    Attributes:
-        exercise_type: Name of the exercise (e.g., 'bicep_curl', 'squat')
-        thresholds: Threshold configuration for feedback categorization
-        metric_weights: List of weighted metrics for quality score calculation
-        feedback_templates: Dict mapping category to list of feedback messages
-    """
+    """Complete configuration for an exercise type."""
     exercise_type: str
     thresholds: ThresholdConfig
     metric_weights: List[MetricWeight]
     feedback_templates: Dict[str, List[str]]
-    
+
     def validate(self) -> bool:
-        """Validate the exercise configuration.
-        
-        Returns:
-            True if configuration is valid, False otherwise
-        """
         # Validate thresholds
         if not self.thresholds.validate():
             return False
-        
-        # Validate that feedback templates exist for all categories
-        required_categories = {'poor', 'average', 'excellent'}
+
+        # Normalize exercise type
+        self.exercise_type = self.exercise_type.lower().strip()
+
+        # Validate feedback categories
+        required_categories = {"poor", "average", "excellent"}
         if not required_categories.issubset(self.feedback_templates.keys()):
             logger.error(
                 f"Missing feedback templates for {self.exercise_type}. "
                 f"Required: {required_categories}, Found: {set(self.feedback_templates.keys())}"
             )
             return False
-        
+
+        # Ensure feedback lists are not empty
+        for k, v in self.feedback_templates.items():
+            if not v:
+                logger.error(
+                    f"Feedback list for '{k}' in {self.exercise_type} is empty."
+                )
+                return False
+
+        # Validate metric weights
+        total_weight = sum(m.weight for m in self.metric_weights)
+
+        if self.metric_weights:
+            if not (0.95 <= total_weight <= 1.05):
+                logger.error(
+                    f"Metric weights for {self.exercise_type} must sum to 1.0, "
+                    f"got {total_weight}"
+                )
+                return False
+
+            for m in self.metric_weights:
+                if not (0.0 <= m.weight <= 1.0):
+                    logger.error(
+                        f"Invalid weight for {m.name}: {m.weight}. Must be between 0 and 1."
+                    )
+                    return False
+
         return True
 
 
-# Feedback message templates for bicep curls
+# -----------------------------
+# Feedback Templates
+# -----------------------------
+
 BICEP_CURL_FEEDBACK = {
     "poor": [
         "Lock those elbows in! Keep them tight to your sides.",
@@ -108,7 +116,6 @@ BICEP_CURL_FEEDBACK = {
     ]
 }
 
-# Feedback message templates for squats
 SQUAT_FEEDBACK = {
     "poor": [
         "Go deeper! Aim to get your thighs parallel to the ground.",
@@ -127,7 +134,6 @@ SQUAT_FEEDBACK = {
     ]
 }
 
-# Feedback message templates for push-ups
 PUSHUP_FEEDBACK = {
     "poor": [
         "Keep your body straight! Don't let those hips sag.",
@@ -146,42 +152,46 @@ PUSHUP_FEEDBACK = {
     ]
 }
 
-# Exercise-specific configurations
+
+# -----------------------------
+# Exercise Configurations
+# -----------------------------
+
 EXERCISE_CONFIGS = {
     "bicep_curl": ExerciseConfig(
         exercise_type="bicep_curl",
-        thresholds=ThresholdConfig(poor_threshold=60.0, good_threshold=85.0),
+        thresholds=ThresholdConfig(),
         metric_weights=[
-            MetricWeight(name="elbow_angle_score", weight=0.5, is_critical=True),
-            MetricWeight(name="elbow_stability_score", weight=0.5, is_critical=True),
+            MetricWeight("elbow_angle_score", 0.5, True),
+            MetricWeight("elbow_stability_score", 0.5, True),
         ],
         feedback_templates=BICEP_CURL_FEEDBACK
     ),
     "squat": ExerciseConfig(
         exercise_type="squat",
-        thresholds=ThresholdConfig(poor_threshold=60.0, good_threshold=85.0),
+        thresholds=ThresholdConfig(),
         metric_weights=[
-            MetricWeight(name="depth_score", weight=0.33, is_critical=False),
-            MetricWeight(name="knee_alignment_score", weight=0.33, is_critical=True),
-            MetricWeight(name="back_position_score", weight=0.34, is_critical=True),
+            MetricWeight("depth_score", 0.33, False),
+            MetricWeight("knee_alignment_score", 0.33, True),
+            MetricWeight("back_position_score", 0.34, True),
         ],
         feedback_templates=SQUAT_FEEDBACK
     ),
     "push_up": ExerciseConfig(
         exercise_type="push_up",
-        thresholds=ThresholdConfig(poor_threshold=60.0, good_threshold=85.0),
+        thresholds=ThresholdConfig(),
         metric_weights=[
-            MetricWeight(name="body_alignment_score", weight=0.5, is_critical=True),
-            MetricWeight(name="elbow_angle_score", weight=0.5, is_critical=False),
+            MetricWeight("body_alignment_score", 0.5, True),
+            MetricWeight("elbow_angle_score", 0.5, False),
         ],
         feedback_templates=PUSHUP_FEEDBACK
     ),
 }
 
-# Default configuration for unknown exercise types
+
 DEFAULT_CONFIG = ExerciseConfig(
     exercise_type="default",
-    thresholds=ThresholdConfig(poor_threshold=60.0, good_threshold=85.0),
+    thresholds=ThresholdConfig(),
     metric_weights=[],
     feedback_templates={
         "poor": ["Focus on your form!"],
@@ -191,36 +201,29 @@ DEFAULT_CONFIG = ExerciseConfig(
 )
 
 
+# -----------------------------
+# Public Access API
+# -----------------------------
+
 def get_exercise_config(exercise_type: str) -> ExerciseConfig:
-    """Get configuration for a specific exercise type.
-    
-    Handles edge cases:
-    - Unknown exercise type: returns DEFAULT_CONFIG with warning log
-    - Invalid configuration: returns DEFAULT_CONFIG with error log
-    
-    Args:
-        exercise_type: Name of the exercise
-        
-    Returns:
-        ExerciseConfig for the specified exercise, or DEFAULT_CONFIG if not found
-    """
+    if not exercise_type:
+        logger.warning("Empty exercise type provided, using default config.")
+        return DEFAULT_CONFIG
+
+    exercise_type = exercise_type.lower().strip()
     config = EXERCISE_CONFIGS.get(exercise_type)
-    
+
     if config is None:
         logger.warning(
             f"Unknown exercise type '{exercise_type}', using default configuration. "
-            f"Available types: {list(EXERCISE_CONFIGS.keys())}"
+            f"Available: {list(EXERCISE_CONFIGS.keys())}"
         )
         return DEFAULT_CONFIG
-    
-    # Validate configuration
+
     if not config.validate():
         logger.error(
-            f"Invalid configuration for '{exercise_type}': "
-            f"poor_threshold={config.thresholds.poor_threshold}, "
-            f"good_threshold={config.thresholds.good_threshold}. "
-            f"Using default configuration instead."
+            f"Invalid configuration for '{exercise_type}', falling back to default."
         )
         return DEFAULT_CONFIG
-    
+
     return config
