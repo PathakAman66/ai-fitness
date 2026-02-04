@@ -14,6 +14,61 @@ def main():
         layout="wide"
     )
     
+    # Custom CSS for Navbar
+    st.markdown("""
+    <style>
+        .navbar {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 1rem 2rem;
+            border-radius: 10px;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .navbar-brand {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: white;
+            display: inline-block;
+            margin-right: 2rem;
+        }
+        .navbar-links {
+            display: inline-block;
+            color: white;
+        }
+        .navbar-link {
+            color: white;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            margin: 0 0.5rem;
+            border-radius: 5px;
+            transition: background 0.3s;
+            display: inline-block;
+        }
+        .navbar-link:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        .navbar-right {
+            float: right;
+            color: white;
+            font-weight: 500;
+        }
+    </style>
+    """, unsafe_allow_html=True)
+    
+    # Navbar
+    st.markdown("""
+    <div class="navbar">
+        <span class="navbar-brand">🏋️ AI Fitness Trainer</span>
+        <div class="navbar-links">
+            <a href="#" class="navbar-link">Home</a>
+            <a href="#workout" class="navbar-link">Workout</a>
+            <a href="#progress" class="navbar-link">Progress</a>
+            <a href="#about" class="navbar-link">About</a>
+        </div>
+        <div class="navbar-right">💪 Get Fit with AI</div>
+    </div>
+    """, unsafe_allow_html=True)
+    
     st.title("🏋️ AI Fitness Trainer")
     st.markdown("Real-time exercise form analysis using computer vision")
     
