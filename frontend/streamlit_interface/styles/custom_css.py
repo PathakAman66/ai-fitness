@@ -23,6 +23,8 @@ def get_custom_css() -> str:
     <style>
     /* Import Google Fonts */
     @import url('{GOOGLE_FONTS_URL}');
+    /* Import FontAwesome */
+    @import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css');
     
     /* Global Styles */
     * {{
@@ -199,6 +201,198 @@ def get_custom_css() -> str:
         .glass-card {{
             padding: {SPACING['lg']};
         }}
+    }}
+    /* History Page Styles */
+    .history-card {
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        border-radius: 16px;
+        padding: 1.5rem;
+        margin-bottom: 1rem;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .history-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.03), transparent);
+        transform: translateX(-100%);
+        transition: 0.5s;
+    }
+
+    .history-card:hover {
+        transform: translateY(-5px);
+        background: rgba(255, 255, 255, 0.06);
+        border-color: rgba(139, 92, 246, 0.3);
+        box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
+    }
+
+    .history-card:hover::before {
+        transform: translateX(100%);
+    }
+
+    .history-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1rem;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        padding-bottom: 1rem;
+    }
+
+    .history-title {
+        color: #f3f4f6;
+        font-size: 1.1rem;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .history-date {
+        color: #9ca3af;
+        font-size: 0.85rem;
+    }
+
+    .history-stats {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 1rem;
+    }
+
+    .stat-item {
+        background: rgba(0, 0, 0, 0.2);
+        padding: 0.8rem;
+        border-radius: 12px;
+        text-align: center;
+    }
+
+    .stat-label {
+        color: #9ca3af;
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 0.3rem;
+    }
+
+    .stat-value {
+        color: #e5e7eb;
+        font-size: 1.1rem;
+        font-weight: 600;
+        font-family: 'Inter', sans-serif;
+    }
+
+    .status-badge {
+        padding: 0.3rem 0.8rem;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        letter-spacing: 0.5px;
+    }
+
+    .status-completed {
+        background: rgba(16, 185, 129, 0.1);
+        color: #34d399;
+        border: 1px solid rgba(16, 185, 129, 0.2);
+    }
+
+    .status-active {
+        background: rgba(59, 130, 246, 0.1);
+        color: #60a5fa;
+        border: 1px solid rgba(59, 130, 246, 0.2);
+    }
+
+    .status-incomplete {
+        background: rgba(245, 158, 11, 0.1);
+        color: #fbbf24;
+        border: 1px solid rgba(245, 158, 11, 0.2);
+    }
+    
+    /* Footer Styles */
+    .footer {{
+        background-color: #2d2d2d;
+        color: #ffffff;
+        padding: 3rem 1rem;
+        margin-top: 5rem;
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+    }}
+    
+    .footer-content {{
+        max-width: 1200px;
+        margin: 0 auto;
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 2rem;
+    }}
+    
+    .footer-section h3 {{
+        color: #8b5cf6;
+        font-size: 1.2rem;
+        font-weight: 600;
+        margin-bottom: 1rem;
+        margin-top: 0;
+    }}
+    
+    .footer-section p {{
+        color: #9ca3af;
+        font-size: 0.9rem;
+        line-height: 1.6;
+        margin-bottom: 1rem;
+    }}
+    
+    .footer-social-links {{
+        display: flex;
+        gap: 1.2rem;
+        margin-top: 1rem;
+    }}
+    
+    .footer-social-links a {{
+        color: #e5e7eb;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.1);
+    }}
+    
+    .footer-social-links a:hover {{
+        background: #8b5cf6;
+        color: white;
+        transform: translateY(-3px);
+    }}
+    
+    .footer-bottom {{
+        text-align: center;
+        margin-top: 3rem;
+        padding-top: 1.5rem;
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+        color: #6b7280;
+        font-size: 0.85rem;
+    }}
+    
+    .footer-badges {{
+        display: flex;
+        justify-content: center;
+        gap: 1rem;
+        margin-top: 0.8rem;
+    }}
+    
+    .footer-badge {{
+        background: rgba(139, 92, 246, 0.1);
+        color: #a78bfa;
+        padding: 0.2rem 0.6rem;
+        border-radius: 12px;
+        font-size: 0.75rem;
     }}
     </style>
     """

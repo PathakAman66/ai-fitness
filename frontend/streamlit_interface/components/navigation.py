@@ -144,6 +144,9 @@ class Navigation:
                     label=page["label"],
                     icon_category_key=page["icon"]
                 )
+            
+            # Render social links
+            Navigation.render_social_links()
     
     @staticmethod
     def _render_nav_item(page_key: str, label: str, icon_category_key: str) -> None:
@@ -206,6 +209,51 @@ class Navigation:
         
         # Add spacing between items
         st.markdown(f'<div style="margin-bottom: {SPACING["xs"]};"></div>', unsafe_allow_html=True)
+
+    @staticmethod
+    def render_social_links() -> None:
+        """
+        Render social media links in the sidebar.
+        """
+        st.markdown(
+            f"""
+            <div style="
+                margin-top: {SPACING['xl']};
+                padding-top: {SPACING['lg']};
+                border-top: 1px solid var(--nav-border);
+            ">
+                <p style="
+                    font-family: {TYPOGRAPHY['font_family_primary']};
+                    font-size: {TYPOGRAPHY['font_size_xs']};
+                    font-weight: {TYPOGRAPHY['font_weight_semibold']};
+                    color: var(--nav-text-secondary);
+                    text-transform: uppercase;
+                    letter-spacing: {TYPOGRAPHY['letter_spacing_wide']};
+                    margin-bottom: {SPACING['sm']};
+                ">
+                    Connect
+                </p>
+                <div style="display: flex; gap: 15px; flex-wrap: wrap;">
+                    <a href="https://github.com/Suvam18" target="_blank" style="text-decoration: none; color: var(--nav-text-secondary); transition: color 0.3s;">
+                        <i class="fab fa-github" style="font-size: 20px;"></i>
+                    </a>
+                    <a href="https://www.linkedin.com/in/suvam-chatterjee-ba6b922b2?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=android_app" target="_blank" style="text-decoration: none; color: var(--nav-text-secondary); transition: color 0.3s;">
+                        <i class="fab fa-linkedin" style="font-size: 20px;"></i>
+                    </a>
+                    <a href="https://www.instagram.com/suv_am28/" target="_blank" style="text-decoration: none; color: var(--nav-text-secondary); transition: color 0.3s;">
+                        <i class="fab fa-instagram" style="font-size: 20px;"></i>
+                    </a>
+                    <a href="https://www.facebook.com" target="_blank" style="text-decoration: none; color: var(--nav-text-secondary); transition: color 0.3s;">
+                        <i class="fab fa-facebook" style="font-size: 20px;"></i>
+                    </a>
+                    <a href="https://twitter.com" target="_blank" style="text-decoration: none; color: var(--nav-text-secondary); transition: color 0.3s;">
+                        <i class="fab fa-twitter" style="font-size: 20px;"></i>
+                    </a>
+                </div>
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
     
     @staticmethod
     def highlight_active_page(page_name: str) -> None:

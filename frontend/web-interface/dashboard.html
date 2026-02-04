@@ -1,24 +1,27 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>AI Fitness Dashboard</title>
 
- 
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500&family=Montserrat:wght@600;700&display=swap" rel="stylesheet">
+
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500&family=Montserrat:wght@600;700&display=swap"
+    rel="stylesheet">
   <link rel="stylesheet" href="dashboard.css">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 </head>
-<body>
- 
 
-<header>
-  <h1>
-    <span class="color-primary">🏋️AI Fitness</span> <span class="color-secondary">Dashboard</span>
-  </h1>
-</header>
+<body>
+
+
+  <header>
+    <h1>
+      <span class="color-primary">🏋️AI Fitness</span> <span class="color-secondary">Dashboard</span>
+    </h1>
+  </header>
 
   <section class="summary">
     <div>
@@ -53,12 +56,112 @@
         </tr>
       </thead>
       <tbody id="workoutsTable">
-       
+
       </tbody>
     </table>
   </section>
 
 
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
   <script src="dashboard.js" defer></script>
+
+  <style>
+    /* Footer Styles for Dashboard */
+    footer {
+      background: #2d2d2d;
+      color: white;
+      padding: 3rem 2rem 1rem;
+      margin-top: 50px;
+    }
+
+    .footer-content {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 3rem;
+      margin-bottom: 2rem;
+    }
+
+    .footer-section h3 {
+      color: #667eea;
+      margin-bottom: 1rem;
+      font-size: 1.2rem;
+    }
+
+    .footer-section p {
+      color: #e0e0e0;
+      font-size: 0.95rem;
+      line-height: 1.6;
+    }
+
+    .social-links-footer {
+      display: flex;
+      gap: 1.5rem;
+    }
+
+    .social-links-footer a {
+      color: white;
+      font-size: 1.5rem;
+      transition: transform 0.3s, color 0.3s;
+    }
+
+    .social-links-footer a:hover {
+      transform: translateY(-3px);
+      color: #667eea;
+    }
+
+    .footer-bottom {
+      text-align: center;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      padding-top: 2rem;
+    }
+
+    .badges {
+      margin-top: 1rem;
+    }
+
+    .badge {
+      background: #667eea;
+      padding: 0.4rem 1rem;
+      border-radius: 20px;
+      margin: 0 0.5rem;
+      display: inline-block;
+      font-size: 0.8rem;
+    }
+  </style>
+
+  <footer>
+    <div class="footer-content">
+      <div class="footer-section about">
+        <h3>🏋️ AI Fitness Trainer</h3>
+        <p>Your personal AI-powered fitness coach. Detects your form in real-time and provides instant feedback to help
+          you workout safely and effectively.</p>
+      </div>
+
+      <div class="footer-section connect">
+        <h3>Connect With Us</h3>
+        <div class="social-links-footer">
+          <a href="https://github.com/Suvam18" target="_blank" title="GitHub"><i class="fab fa-github"></i></a>
+          <a href="https://www.linkedin.com/in/suvam-chatterjee-ba6b922b2?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=android_app"
+            target="_blank" title="LinkedIn"><i class="fab fa-linkedin"></i></a>
+          <a href="https://www.instagram.com/suv_am28/" target="_blank" title="Instagram"><i
+              class="fab fa-instagram"></i></a>
+          <a href="https://www.facebook.com" target="_blank" title="Facebook"><i class="fab fa-facebook"></i></a>
+          <a href="https://twitter.com" target="_blank" title="Twitter"><i class="fab fa-twitter"></i></a>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer-bottom">
+      <p>&copy; 2024 AI Fitness Trainer. Built with Python, OpenCV, and MediaPipe.</p>
+      <div class="badges">
+        <span class="badge">Python 3.8+</span>
+        <span class="badge">OpenCV 4.8</span>
+        <span class="badge">MediaPipe 0.10</span>
+      </div>
+    </div>
+  </footer>
 </body>
+
 </html>

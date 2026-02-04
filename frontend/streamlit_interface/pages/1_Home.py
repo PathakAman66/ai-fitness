@@ -19,6 +19,7 @@ from utils.icons import inject_material_icons_cdn
 from utils.state_manager import StateManager
 from components.navigation import Navigation
 from components.hero_carousel import render_hero_carousel
+from components.footer import render_footer
 
 
 def get_base64_image(image_path):
@@ -598,9 +599,11 @@ def main():
                 key=f"start_{exercise['type']}",
                 use_container_width=True,
             ):
-                StateManager.set("active_exercise", exercise["type"])
                 StateManager.set_current_page("workout")
                 st.switch_page("pages/2_Workout.py")
+
+    # Render Footer
+    render_footer()
 
 
 if __name__ == "__main__":

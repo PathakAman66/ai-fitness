@@ -195,9 +195,11 @@ def render_summary_statistics(sessions):
             )
 
 
+from components.footer import render_footer
+
 def render_session_card(session):
     """
-    Render a single workout session card.
+    Render a single workout session card using custom HTML/CSS.
     
     Args:
         session: Workout session dictionary
@@ -214,34 +216,50 @@ def render_session_card(session):
     )
     reps = session.get('reps', 0)
     calories = session.get('calories', 0.0)
-    status = session.get('status', 'unknown')
+    status = session.get('status', 'unknown').lower()
     
-    # Use Streamlit's native container
-    with st.container():
-        col1, col2 = st.columns([3, 1])
+    # Determine status class and icon
+    status_class = "status-incomplete"
+    status_icon = "⚠️"
+    if status == 'completed':
+        status_class = "status-completed"
+        status_icon = "✅"
+    elif status == 'active':
+        status_class = "status-active"
+        status_icon = "🏃"
+
+    # Custom HTML Card
+    card_html = f"""
+    <div class="history-card animate-slide-up">
+        <div class="history-header">
+            <div class="history-title">
+                {exercise_name}
+                <span class="status-badge {status_class}">
+                    {status_icon} {status.upper()}
+                </span>
+            </div>
+            <div class="history-date">
+                📅 {date_formatted}
+            </div>
+        </div>
         
-        with col1:
-            st.subheader(f"💪 {exercise_name}")
-            st.caption(f"📅 {date_formatted}")
-            
-        with col2:
-            if status.lower() == 'completed':
-                st.success(status.upper())
-            elif status.lower() == 'active':
-                st.info(status.upper())
-            else:
-                st.warning(status.upper())
-        
-        # Metrics row
-        metric_col1, metric_col2, metric_col3 = st.columns(3)
-        with metric_col1:
-            st.metric("Reps", reps)
-        with metric_col2:
-            st.metric("Duration", duration_formatted)
-        with metric_col3:
-            st.metric("Calories", f"{calories:.1f}")
-        
-        st.divider()
+        <div class="history-stats">
+            <div class="stat-item">
+                <div class="stat-label">Reps</div>
+                <div class="stat-value">{reps}</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-label">Duration</div>
+                <div class="stat-value">{duration_formatted}</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-label">Calories</div>
+                <div class="stat-value">{calories:.1f}</div>
+            </div>
+        </div>
+    </div>
+    """
+    st.markdown(card_html, unsafe_allow_html=True)
 
 
 def render_session_list(sessions):
@@ -278,108 +296,6 @@ def render_empty_state(filter_applied=False):
             st.switch_page("pages/2_Workout.py")
 
 
-def inject_hover_styles():
-    """Inject CSS for hover effects on session cards and dark mode support."""
-    st.markdown(
-        f"""
-        <style>
-        /* Dark mode CSS variables */
-        :root {{
-            --text-color: #111827;
-            --text-secondary: #6b7280;
-            --card-bg: #f9fafb;
-            --border-color: #e5e7eb;
-        }}
-        
-        @media (prefers-color-scheme: dark) {{
-            :root {{
-                --text-color: #f9fafb;
-                --text-secondary: #9ca3af;
-                --card-bg: #1f2937;
-                --border-color: #374151;
-            }}
-        }}
-        
-        [data-testid="stAppViewContainer"][data-theme="dark"] {{
-            --text-color: #f9fafb;
-            --text-secondary: #9ca3af;
-            --card-bg: #1f2937;
-            --border-color: #374151;
-        }}
-        
-        [data-testid="stAppViewContainer"][data-theme="dark"] h1,
-        [data-testid="stAppViewContainer"][data-theme="dark"] h2,
-        [data-testid="stAppViewContainer"][data-theme="dark"] h3 {{
-            color: var(--text-color) !important;
-        }}
-        
-        [data-testid="stAppViewContainer"][data-theme="dark"] p {{
-            color: var(--text-secondary) !important;
-        }}
-        
-        /* Remove white space at top */
-        [data-testid="stHeader"] {{
-            background-color: transparent !important;
-        }}
-        
-        [data-testid="stToolbar"] {{
-            background-color: transparent !important;
-        }}
-        
-        [data-testid="stToolbar"] > div:not(:first-child) {{
-            display: none !important;
-        }}
-        
-        .main .block-container {{
-            padding-top: 1rem !important;
-            padding-bottom: 1rem !important;
-        }}
-        
-        section[data-testid="stSidebar"] > div:first-child {{
-            padding-top: 1rem !important;
-        }}
-        
-        /* Fix button text visibility in both light and dark mode */
-        .stButton > button {{
-            color: #ffffff !important;
-            background-color: #2563eb !important;
-        }}
-        
-        .stButton > button:hover {{
-            background-color: #1e40af !important;
-            color: #ffffff !important;
-        }}
-        
-        /* Fix button text in dark mode */
-        [data-testid="stAppViewContainer"][data-theme="dark"] .stButton > button {{
-            color: #ffffff !important;
-            background-color: #2563eb !important;
-        }}
-        
-        [data-testid="stAppViewContainer"][data-theme="dark"] .stButton > button:hover {{
-            background-color: #1e40af !important;
-            color: #ffffff !important;
-        }}
-        
-        /* Hover effects */
-        .session-card:hover {{
-            transform: translateY(-2px);
-            box-shadow: {SHADOWS['lg']};
-            border-color: {COLORS['primary_light']};
-        }}
-        
-        /* Responsive adjustments */
-        @media (max-width: 768px) {{
-            .session-card {{
-                padding: {SPACING['md']};
-            }}
-        }}
-        </style>
-        """,
-        unsafe_allow_html=True,
-    )
-
-
 def main():
     """Main function to render the History page."""
     # Apply page configuration
@@ -393,7 +309,7 @@ def main():
     # Inject custom CSS and Material Icons
     inject_custom_css()
     inject_material_icons_cdn()
-    inject_hover_styles()
+    # inject_hover_styles removed as styles are now in custom_css
     
     # Initialize session state
     StateManager.initialize_all()
@@ -446,10 +362,10 @@ def main():
             # Render session list
             render_session_list(sorted_sessions)
     
-    # Footer
-    st.divider()
-    st.caption("AI Fitness Trainer © 2024 | Track Your Progress")
+    # Render Footer at the bottom
+    render_footer()
 
 
 if __name__ == "__main__":
     main()
+
