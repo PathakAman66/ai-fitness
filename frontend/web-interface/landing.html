@@ -11,10 +11,19 @@
 
 <body>
     <header>
-        <nav>
+        <nav class="navbar">
             <div class="logo">🏋️ AI Fitness Trainer</div>
-            <a href="#get-started" class="cta-button">Get Started</a>
-            <a href="#get-started" class="cta-button">Get Started</a>
+            <button class="mobile-menu-toggle" aria-label="Toggle menu">
+                <span class="hamburger"></span>
+            </button>
+            <ul class="nav-menu">
+                <li><a href="#home" class="nav-link">Home</a></li>
+                <li><a href="#features" class="nav-link">Features</a></li>
+                <li><a href="#how-it-works" class="nav-link">How It Works</a></li>
+                <li><a href="#get-started" class="nav-link">Get Started</a></li>
+                <li><a href="dashboard.html" class="nav-link">Dashboard</a></li>
+                <li><a href="#get-started" class="cta-button">Start Training</a></li>
+            </ul>
         </nav>
     </header>
 
@@ -60,7 +69,7 @@
         </div>
     </section>
 
-    <section class="workflow">
+    <section id="how-it-works" class="workflow">
         <h2>How It Works</h2>
         <div class="workflow-steps">
             <div class="step">
@@ -133,6 +142,52 @@ pip install -r requirements/requirements.txt</code></pre>
             </div>
         </div>
     </footer>
+
+    <script>
+        // Mobile menu toggle functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const mobileMenuToggle = document.querySelector('.mobile-menu-toggle');
+            const navMenu = document.querySelector('.nav-menu');
+            
+            mobileMenuToggle.addEventListener('click', function() {
+                navMenu.classList.toggle('active');
+                mobileMenuToggle.classList.toggle('active');
+            });
+
+            // Close mobile menu when clicking on a nav link
+            const navLinks = document.querySelectorAll('.nav-link, .cta-button');
+            navLinks.forEach(link => {
+                link.addEventListener('click', function() {
+                    navMenu.classList.remove('active');
+                    mobileMenuToggle.classList.remove('active');
+                });
+            });
+
+            // Smooth scroll for anchor links
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    const target = document.querySelector(this.getAttribute('href'));
+                    if (target) {
+                        target.scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'start'
+                        });
+                    }
+                });
+            });
+
+            // Navbar background change on scroll
+            window.addEventListener('scroll', function() {
+                const header = document.querySelector('header');
+                if (window.scrollY > 50) {
+                    header.classList.add('scrolled');
+                } else {
+                    header.classList.remove('scrolled');
+                }
+            });
+        });
+    </script>
 </body>
 
 </html>
