@@ -17,6 +17,47 @@ st.set_page_config(
 # Custom CSS
 st.markdown("""
 <style>
+    .navbar {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        padding: 1rem 2rem;
+        border-radius: 10px;
+        margin-bottom: 2rem;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    .navbar-brand {
+        font-size: 1.8rem;
+        font-weight: bold;
+        color: white;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    .navbar-menu {
+        display: flex;
+        gap: 1rem;
+        align-items: center;
+    }
+    .navbar-link {
+        color: white;
+        text-decoration: none;
+        padding: 0.5rem 1rem;
+        border-radius: 5px;
+        transition: background 0.3s;
+        font-weight: 500;
+    }
+    .navbar-link:hover {
+        background: rgba(255, 255, 255, 0.2);
+    }
+    .navbar-badge {
+        background: rgba(255, 255, 255, 0.3);
+        padding: 0.25rem 0.75rem;
+        border-radius: 15px;
+        color: white;
+        font-size: 0.9rem;
+    }
     .main-header {
         font-size: 3rem;
         color: #FF4B4B;
@@ -43,6 +84,23 @@ st.markdown("""
         font-weight: bold;
     }
 </style>
+""", unsafe_allow_html=True)
+
+# Navbar
+st.markdown("""
+<div class="navbar">
+    <div class="navbar-brand">
+        <span>🏋️</span>
+        <span>AI Fitness Trainer</span>
+    </div>
+    <div class="navbar-menu">
+        <a href="#" class="navbar-link">🏠 Home</a>
+        <a href="#workout" class="navbar-link">💪 Workout</a>
+        <a href="#analytics" class="navbar-link">📊 Analytics</a>
+        <a href="#settings" class="navbar-link">⚙️ Settings</a>
+        <span class="navbar-badge">✨ AI Powered</span>
+    </div>
+</div>
 """, unsafe_allow_html=True)
 
 class SimpleTrainer:
