@@ -211,6 +211,7 @@ def get_all_exercises():
                 "duration": "10-15 min",
                 "calories": "50-80",
                 "benefits": ["Strengthens biceps", "Improves arm definition", "Enhances grip strength"],
+                "category": "Upper Body",
             },
             {
                 "type": "push_up",
@@ -221,6 +222,7 @@ def get_all_exercises():
                 "duration": "10-15 min",
                 "calories": "60-100",
                 "benefits": ["Strengthens chest", "Builds shoulders", "Engages core"],
+                "category": "Upper Body",
             },
             {
                 "type": "shoulder_press",
@@ -231,6 +233,7 @@ def get_all_exercises():
                 "duration": "12-18 min",
                 "calories": "70-110",
                 "benefits": ["Builds deltoids", "Improves posture", "Increases upper body power"],
+                "category": "Upper Body",
             },
         ],
         "Lower Body": [
@@ -243,6 +246,7 @@ def get_all_exercises():
                 "duration": "12-18 min",
                 "calories": "80-120",
                 "benefits": ["Builds leg muscles", "Strengthens core", "Improves mobility"],
+                "category": "Lower Body",
             },
             {
                 "type": "lunge",
@@ -253,6 +257,7 @@ def get_all_exercises():
                 "duration": "10-15 min",
                 "calories": "70-100",
                 "benefits": ["Strengthens quads", "Improves balance", "Builds glutes"],
+                "category": "Lower Body",
             },
         ],
         "Core": [
@@ -265,20 +270,42 @@ def get_all_exercises():
                 "duration": "8-12 min",
                 "calories": "40-70",
                 "benefits": ["Strengthens core", "Improves posture", "Builds endurance"],
+                "category": "Core",
             },
         ],
     }
 
 
-def get_category_color(category):
-    """Get gradient colors for each category."""
-    colors = {
-        "Upper Body": ("rgba(37, 99, 235, 0.1)", "#2563eb"),  # Blue
-        "Lower Body": ("rgba(139, 92, 246, 0.1)", "#8b5cf6"),  # Purple
-        "Core": ("rgba(249, 115, 22, 0.1)", "#f97316"),  # Orange
-        "Cardio": ("rgba(239, 68, 68, 0.1)", "#ef4444"),  # Red
+def get_category_style(category):
+    """Get theme-aware glassmorphism styles for each category."""
+    styles = {
+        "Upper Body": (
+            "linear-gradient(145deg, rgba(37, 99, 235, 0.4) 0%, rgba(30, 58, 138, 0.4) 100%)", # Blue bg
+            "rgba(59, 130, 246, 0.3)", # Blue border
+            "0 0 20px rgba(37, 99, 235, 0.2)" # Blue glow
+        ),
+        "Lower Body": (
+            "linear-gradient(145deg, rgba(139, 92, 246, 0.4) 0%, rgba(88, 28, 135, 0.4) 100%)", # Purple bg
+            "rgba(167, 139, 250, 0.3)", # Purple border
+            "0 0 20px rgba(139, 92, 246, 0.2)" # Purple glow
+        ),
+        "Core": (
+            "linear-gradient(145deg, rgba(249, 115, 22, 0.4) 0%, rgba(154, 52, 18, 0.4) 100%)", # Orange bg
+            "rgba(251, 146, 60, 0.3)", # Orange border
+            "0 0 20px rgba(249, 115, 22, 0.2)" # Orange glow
+        ),
+        "Cardio": (
+            "linear-gradient(145deg, rgba(239, 68, 68, 0.4) 0%, rgba(153, 27, 27, 0.4) 100%)", # Red bg
+            "rgba(248, 113, 113, 0.3)", # Red border
+            "0 0 20px rgba(239, 68, 68, 0.2)" # Red glow
+        ),
     }
-    return colors.get(category, ("rgba(100, 116, 139, 0.1)", "#64748b"))
+    # Default to Slate/Gray
+    return styles.get(category, (
+        "linear-gradient(145deg, rgba(100, 116, 139, 0.4) 0%, rgba(51, 65, 85, 0.4) 100%)",
+        "rgba(148, 163, 184, 0.3)",
+        "0 0 20px rgba(148, 163, 184, 0.2)"
+    ))
 
 
 def get_difficulty_color(difficulty):
@@ -297,9 +324,7 @@ def render_exercise_selection():
     # Get all exercises
     all_exercises = get_all_exercises()
     
-    # Header
-    st.markdown("## Choose Your Workout")
-    st.markdown("Select from our exercise library organized by muscle group")
+
     
     # Category tabs
     categories = ["All"] + list(all_exercises.keys())
@@ -1325,16 +1350,16 @@ def main():
     inject_material_icons_cdn()
     inject_hover_styles()
 
-    # Add HD fitness background
-    # Using an action shot of working out
-    bg_image_url = "https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?q=80&w=1920&auto=format&fit=crop"
+    # Add HD fitness background - Unique "App Code" aesthetic
+    # Using high-quality gym equipment close-up (Weights)
+    bg_image_url = "https://images.unsplash.com/photo-1526506118085-60ce8714f8c5?q=80&w=2670&auto=format&fit=crop"
     
     st.markdown(
         f"""
         <style>
-        /* Force Main Background Override */
-        [data-testid="stAppViewContainer"] {{
-            background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), 
+        /* Force Main Background Override - Robust Selectors */
+        .stApp, [data-testid="stAppViewContainer"], [data-testid="stApp"] {{
+            background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.85)), 
                 url('{bg_image_url}') !important;
             background-size: cover !important;
             background-position: center !important;
@@ -1342,31 +1367,25 @@ def main():
             background-repeat: no-repeat !important;
         }}
         
-        /* Also target .stApp as a fallback */
-        .stApp {{
+        /* Make all headers and toolbars transparent */
+        [data-testid="stHeader"], [data-testid="stToolbar"] {{
+            background-color: transparent !important;
+        }}
+        
+        .main {{
             background: transparent !important;
         }}
         
-        /* Card Styling Enhancement - FORCE SOLID - BROAD SELECTOR */
-        div[data-testid="stVerticalBlockBorderWrapper"],
-        div[class*="stVerticalBlockBorderWrapper"],
-        div[data-testid="stVerticalBlock"] > div[style*="border"] {{
-            background-color: #1e293b !important; /* Solid Slate 800 */
-            border: 2px solid #3b82f6 !important; /* Blue Border */
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5) !important;
-            border-radius: 0.75rem !important;
-            margin-bottom: 20px !important;
-            padding: 20px !important;
-        }}
-        
-        /* Header Styling */
-        h1, h2, h3, p, div {{
-            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+        /* Ensure text visibility */
+        h1, h2, h3, p, span, div, label {{
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
         }}
         </style>
         """,
         unsafe_allow_html=True
     )
+        
+
     
     # Initialize session state
     StateManager.initialize_all()
@@ -1390,84 +1409,70 @@ def main():
         # Render page header
         render_page_header()
         
+
+        
         # Render exercise selection view
         render_exercise_selection()
         
-        # Footer
-        st.markdown(
-            """
-            <div style="text-align: center; padding: 2rem 0; margin-bottom: 2rem;">
-                <h1 style="font-size: 3.5rem; font-weight: 800; margin-bottom: 1rem; background: linear-gradient(to right, #4facfe 0%, #00f2fe 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
-                    CLASSIC FITNESS
-                </h1>
-                <p style="font-size: 1.2rem; opacity: 0.9; max-width: 600px; margin: 0 auto; color: #e2e8f0;">
-                    Select your workout routine below. Train smart with AI-powered form analysis.
-                </p>
-            </div>
-            """,
-            unsafe_allow_html=True,
-        )
+
+
+
+
 
 
 def render_enhanced_exercise_card(exercise):
-    """Render a modern exercise card using native Streamlit components."""
+    """Render a modern exercise card structure with glassmorphism."""
     
-    # Create a container with a border (native Streamlit card)
-    with st.container(border=True):
-        # Header: Icon and Title
-        col1, col2 = st.columns([1, 4])
-        
-        with col1:
-             st.markdown(f"<div style='font-size: 40px; text-align: center;'>{get_icon_for_exercise(exercise['type'])}</div>", unsafe_allow_html=True)
-             
-        with col2:
-            st.subheader(exercise['display_name'])
-            # Difficulty badge
-            if exercise['difficulty'] == "Beginner":
-                st.caption("🟢 Beginner")
-            elif exercise['difficulty'] == "Intermediate":
-                st.caption("🟡 Intermediate")
-            else:
-                st.caption("🔴 Advanced")
-        
-        st.write(exercise['description'])
-        
-        # User Friendly Details (Expander)
-        with st.expander("See Benefits & Tips"):
-            st.markdown("**/Benefits:**")
-            for benefit in exercise.get('benefits', []):
-                st.markdown(f"- {benefit}")
-            st.markdown(f"**Best for:** {exercise.get('difficulty')} level")
-            
-        st.divider()
-        
-        # Metadata in columns
-        c1, c2 = st.columns(2)
-        with c1:
-            st.caption("Duration")
-            st.markdown(f"**{exercise['duration']}**")
-        with c2:
-            st.caption("Calories")
-            st.markdown(f"**{exercise['calories']}**")
-        
-        st.write("")
-        
-        # Start button
-        if st.button(
-            f"Start Workout",
-            key=f"start_enhanced_{exercise['type']}",
-            use_container_width=True,
-            type="primary"
-        ):
-            with st.spinner(f"Starting {exercise['display_name']} session..."):
-                success = start_workout_session(exercise["type"])
-                
-                if success:
-                    st.success(f"Started!")
-                    time.sleep(1)
-                    st.rerun()
-                else:
-                    render_session_start_error(exercise['display_name'])
+    # Get theme-aware semi-transparent colors
+    bg_style, border_color, glow_color = get_category_style(exercise.get('category'))
+    
+    st.markdown(
+        f"""
+<div style="background: {bg_style}; backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border-radius: 16px; padding: 24px; margin-bottom: 24px; box-shadow: 0 4px 6px rgba(0,0,0,0.1), {glow_color}; border: 1px solid {border_color}; color: #f8fafc; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); position: relative; overflow: hidden;" class="exercise-card-enhanced">
+<div style="font-size: 48px; margin-bottom: 16px; text-align: center; filter: drop-shadow(0 0 10px rgba(255,255,255,0.3));">
+{get_icon_for_exercise(exercise['type'])}
+</div>
+<h3 style="margin: 0 0 8px 0; font-size: 22px; font-weight: 700; text-align: center; color: #f8fafc !important; text-shadow: 0 2px 4px rgba(0,0,0,0.3);">{exercise['display_name']}</h3>
+<div style="text-align: center; margin-bottom: 20px;">
+<span style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; color: #e2e8f0;">{exercise['difficulty']}</span>
+</div>
+<p style="font-size: 15px; line-height: 1.6; opacity: 0.9; margin-bottom: 24px; text-align: center; min-height: 48px; color: #cbd5e1 !important;">
+{exercise['description']}
+</p>
+<div style="display: flex; justify-content: space-between; font-size: 14px; margin-bottom: 0; background: rgba(0,0,0,0.2); padding: 12px 16px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05);">
+<div style="display: flex; align-items: center; gap: 6px; color: #e2e8f0;">
+<span style="font-size: 16px;">⏱️</span> {exercise['duration']}
+</div>
+<div style="display: flex; align-items: center; gap: 6px; color: #e2e8f0;">
+<span style="font-size: 16px;">🔥</span> {exercise['calories']}
+</div>
+</div>
+</div>
+""",
+        unsafe_allow_html=True
+    )
+    
+    col1, col2 = st.columns([1, 1])
+    with col1:
+         with st.expander("Details"):
+             st.markdown(f"**Best for:** {exercise.get('difficulty')}")
+             for benefit in exercise.get('benefits', []):
+                 st.caption(f"• {benefit}")
+                 
+    with col2:
+         # Start button
+         if st.button(
+             f"Start",
+             key=f"start_enhanced_{exercise['type']}",
+             use_container_width=True,
+             type="primary"
+         ):
+             with st.spinner(f"Starting {exercise['display_name']} session..."):
+                 success = start_workout_session(exercise["type"])
+                 if success:
+                     st.rerun()
+                 else:
+                     render_session_start_error(exercise['display_name'])
 
 
 def get_icon_for_exercise(exercise_type):

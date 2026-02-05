@@ -32,11 +32,52 @@ from utils.error_handler import ErrorHandler
 
 def inject_history_background():
     """Inject specific background image for the History page."""
+    # High-quality dark gym aesthetic image (Dumbbells/Weights)
+    bg_image_url = "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=2070&auto=format&fit=crop"
+    
     st.markdown(
-        """
-        <script>
-        document.body.classList.add('history-page-background');
-        </script>
+        f"""
+        <style>
+        /* Force background on the main container - Targeting multiple possible selectors */
+        .stApp, [data-testid="stAppViewContainer"], [data-testid="stApp"] {{
+            background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.8)), 
+                        url('{bg_image_url}') !important;
+            background-size: cover !important;
+            background-position: center !important;
+            background-attachment: fixed !important;
+            background-repeat: no-repeat !important;
+        }}
+        
+        /* Make header and main content container transparent */
+        [data-testid="stHeader"], [data-testid="stToolbar"] {{
+            background-color: transparent !important;
+        }}
+        
+        .main {{
+            background: transparent !important;
+        }}
+        
+        /* Ensure readable text on dark background */
+        h1, h2, h3, p, span, div, label {{
+            color: #ffffff !important;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
+        }}
+        
+        /* Specific adjustments for custom cards */
+        .history-card {{
+            background: rgba(30, 41, 59, 0.7) !important;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2) !important;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+        }}
+        
+        /* Ensure inputs and selects are visible */
+        .stSelectbox div[data-baseweb="select"] > div {{
+            background-color: rgba(30, 41, 59, 0.9) !important;
+            color: white !important;
+            border-color: rgba(255, 255, 255, 0.2);
+        }}
+        </style>
         """,
         unsafe_allow_html=True
     )

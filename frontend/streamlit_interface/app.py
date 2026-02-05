@@ -441,8 +441,65 @@ def main():
     # Configure page settings
     configure_page()
     
+    # Inject Landing Page Background
+    inject_landing_background()
+    
     # Inject custom CSS and theme
     inject_styles()
+
+
+def inject_landing_background():
+    """Inject specific background image for the Landing page."""
+    # Unique HD Gym Aesthetic Image (Dark Moody Gym)
+    bg_image_url = "https://images.unsplash.com/photo-1599058945522-28d584b6f0ff?q=80&w=2669&auto=format&fit=crop"
+    
+    st.markdown(
+        f"""
+        <style>
+        /* Force background on the main container */
+        .stApp, [data-testid="stAppViewContainer"], [data-testid="stApp"] {{
+            background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.9)), 
+                        url('{bg_image_url}') !important;
+            background-size: cover !important;
+            background-position: center !important;
+            background-attachment: fixed !important;
+            background-repeat: no-repeat !important;
+        }}
+        
+        /* Make header transparent */
+        [data-testid="stHeader"] {{
+            background-color: transparent !important;
+        }}
+        
+        .main {{
+            background: transparent !important;
+        }}
+        
+        /* content styling for specific landing page elements to ensure contrast */
+        div[data-testid="stMarkdownContainer"] h1, 
+        div[data-testid="stMarkdownContainer"] h2, 
+        div[data-testid="stMarkdownContainer"] h3 {{
+            text-shadow: 0 2px 4px rgba(0,0,0,0.8);
+        }}
+        
+        /* Card transparency adjustments */
+        div[style*="background: var(--card-bg)"] {{
+            background: rgba(31, 41, 55, 0.7) !important;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1) !important;
+        }}
+        
+        /* Feature section enhancements */
+        div[style*="background: var(--success-bg)"] {{
+            background: rgba(6, 78, 59, 0.6) !important; 
+            backdrop-filter: blur(5px);
+            border-left: 4px solid #10b981 !important;
+            border: 1px solid rgba(16, 185, 129, 0.2);
+        }}
+        </style>
+        """,
+        unsafe_allow_html=True
+    )
     
     # Initialize session state
     initialize_state()

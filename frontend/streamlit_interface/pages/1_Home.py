@@ -60,9 +60,60 @@ def main():
     # Inject custom CSS and Material Icons
     inject_custom_css()
     inject_material_icons_cdn()
+    
+    # Inject Home Page Background
+    inject_home_background()
 
     # Initialize session state
     StateManager.initialize_all()
+
+
+def inject_home_background():
+    """Inject specific background image for the Home page."""
+    # Unique HD Gym Aesthetic Image
+    bg_image_url = "https://images.unsplash.com/photo-1571902943202-507ec2618e8f?q=80&w=2675&auto=format&fit=crop"
+    
+    st.markdown(
+        f"""
+        <style>
+        /* Force background on the main container */
+        .stApp, [data-testid="stAppViewContainer"], [data-testid="stApp"] {{
+            background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.85)), 
+                        url('{bg_image_url}') !important;
+            background-size: cover !important;
+            background-position: center !important;
+            background-attachment: fixed !important;
+            background-repeat: no-repeat !important;
+        }}
+        
+        /* Make header and main content container transparent */
+        [data-testid="stHeader"], [data-testid="stToolbar"] {{
+            background-color: transparent !important;
+        }}
+        
+        .main {{
+            background: transparent !important;
+        }}
+        
+        /* Ensure readability */
+        h1, h2, h3, p, span, div {{
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
+        }}
+        
+        /* Adjust feature cards transparency */
+        .feature-video {{
+            background: rgba(20, 25, 35, 0.6) !important;
+            backdrop-filter: blur(10px);
+        }}
+        
+        .exercise-card-container {{
+            background: rgba(30, 41, 59, 0.6) !important;
+            backdrop-filter: blur(10px);
+        }}
+        </style>
+        """,
+        unsafe_allow_html=True
+    )
 
     # Set current page
     Navigation.set_current_page("home")
