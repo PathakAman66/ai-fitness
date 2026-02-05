@@ -247,6 +247,395 @@ tr:hover {
   cursor: pointer;
 }
 
+/* ============================================
+   ENHANCED FOOTER STYLES
+   ============================================ */
+
+/* Back to Top Button */
+.back-to-top {
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  width: 50px;
+  height: 50px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(20px);
+  transition: all 0.3s ease;
+  z-index: 999;
+}
+
+.back-to-top.visible {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+.back-to-top:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+}
+
+/* Footer Wave */
+.footer-wave {
+  width: 100%;
+  overflow: hidden;
+  line-height: 0;
+  margin-bottom: -1px;
+  margin-top: 50px;
+}
+
+.footer-wave svg {
+  width: 100%;
+  height: 80px;
+  display: block;
+}
+
+/* Footer Main Styles */
+footer {
+  background: #1f1f1f;
+  color: white;
+  padding: 0;
+  position: relative;
+  overflow: hidden;
+}
+
+footer::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 200%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(0, 207, 255, 0.05), transparent);
+  animation: shimmer 3s infinite;
+}
+
+@keyframes shimmer {
+  0% { left: -100%; }
+  100% { left: 100%; }
+}
+
+.footer-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 3rem;
+  padding: 3rem 2rem;
+  position: relative;
+  z-index: 1;
+}
+
+/* Footer Sections */
+.footer-section h3 {
+  color: #00cfff;
+  margin-bottom: 1.5rem;
+  font-size: 1.3rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.footer-section h3 i {
+  font-size: 1.2rem;
+}
+
+.footer-section h4 {
+  color: #00ffe0;
+  margin: 1.5rem 0 1rem;
+  font-size: 1rem;
+}
+
+.footer-section p {
+  color: #b0b0b0;
+  font-size: 0.95rem;
+  line-height: 1.8;
+  margin-bottom: 1rem;
+}
+
+/* Footer Stats */
+.footer-stats {
+  display: flex;
+  gap: 1.5rem;
+  margin-top: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.stat-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  background: rgba(0, 207, 255, 0.1);
+  border-radius: 20px;
+  border: 1px solid rgba(0, 207, 255, 0.2);
+  transition: all 0.3s ease;
+}
+
+.stat-item:hover {
+  background: rgba(0, 207, 255, 0.2);
+  border-color: rgba(0, 207, 255, 0.4);
+  transform: translateY(-2px);
+}
+
+.stat-item i {
+  color: #00cfff;
+  font-size: 1.2rem;
+}
+
+.stat-item span {
+  color: #fff;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+/* Footer Links */
+.footer-section ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.footer-section ul li {
+  margin-bottom: 0.8rem;
+}
+
+.footer-section ul li a {
+  color: #b0b0b0;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: all 0.3s ease;
+  font-size: 0.95rem;
+}
+
+.footer-section ul li a i {
+  font-size: 0.7rem;
+  transition: transform 0.3s ease;
+}
+
+.footer-section ul li a:hover {
+  color: #00cfff;
+  padding-left: 5px;
+}
+
+.footer-section ul li a:hover i {
+  transform: translateX(3px);
+}
+
+/* Newsletter Form */
+.newsletter-form {
+  margin-top: 1rem;
+}
+
+.input-group {
+  display: flex;
+  gap: 0;
+  margin-bottom: 1rem;
+}
+
+.input-group input {
+  flex: 1;
+  padding: 0.8rem 1rem;
+  border: 2px solid rgba(0, 207, 255, 0.3);
+  border-right: none;
+  border-radius: 25px 0 0 25px;
+  background: rgba(255, 255, 255, 0.05);
+  color: white;
+  font-size: 0.9rem;
+  outline: none;
+  transition: all 0.3s ease;
+}
+
+.input-group input::placeholder {
+  color: #888;
+}
+
+.input-group input:focus {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: #00cfff;
+}
+
+.input-group button {
+  padding: 0.8rem 1.5rem;
+  background: linear-gradient(135deg, #00cfff 0%, #00ffe0 100%);
+  border: none;
+  border-radius: 0 25px 25px 0;
+  color: #121212;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.input-group button:hover {
+  transform: translateX(3px);
+  box-shadow: 0 4px 15px rgba(0, 207, 255, 0.4);
+}
+
+/* Social Icons */
+.social-icons {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.social-icon {
+  width: 45px;
+  height: 45px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.05);
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  color: white;
+  font-size: 1.2rem;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.social-icon::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.1);
+  transform: translate(-50%, -50%);
+  transition: width 0.3s ease, height 0.3s ease;
+}
+
+.social-icon:hover::before {
+  width: 100%;
+  height: 100%;
+}
+
+.social-icon:hover {
+  transform: translateY(-5px) rotate(5deg);
+  box-shadow: 0 5px 15px rgba(0, 207, 255, 0.4);
+}
+
+.social-icon.github:hover {
+  background: #333;
+  border-color: #333;
+}
+
+.social-icon.linkedin:hover {
+  background: #0077b5;
+  border-color: #0077b5;
+}
+
+.social-icon.instagram:hover {
+  background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
+  border-color: #bc1888;
+}
+
+.social-icon.facebook:hover {
+  background: #1877f2;
+  border-color: #1877f2;
+}
+
+.social-icon.twitter:hover {
+  background: #1da1f2;
+  border-color: #1da1f2;
+}
+
+/* Footer Divider */
+.footer-divider {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  margin: 0 2rem;
+}
+
+/* Footer Bottom */
+.footer-bottom {
+  padding: 2rem;
+  text-align: center;
+}
+
+.footer-bottom-content {
+  max-width: 1200px;
+  margin: 0 auto 1.5rem;
+}
+
+.footer-bottom-content p {
+  color: #b0b0b0;
+  font-size: 0.9rem;
+  margin-bottom: 1rem;
+}
+
+.footer-links {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.8rem;
+  flex-wrap: wrap;
+}
+
+.footer-links a {
+  color: #888;
+  text-decoration: none;
+  font-size: 0.85rem;
+  transition: color 0.3s ease;
+}
+
+.footer-links a:hover {
+  color: #00cfff;
+}
+
+.footer-links span {
+  color: #666;
+}
+
+/* Badges */
+.badges {
+  display: flex;
+  justify-content: center;
+  gap: 0.8rem;
+  flex-wrap: wrap;
+}
+
+.badge {
+  background: linear-gradient(135deg, #00cfff 0%, #00ffe0 100%);
+  color: #121212;
+  padding: 0.5rem 1.2rem;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 10px rgba(0, 207, 255, 0.2);
+}
+
+.badge:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(0, 207, 255, 0.4);
+}
+
+.badge i {
+  font-size: 1rem;
+}
+
 /* Responsive Navbar Styles */
 @media (max-width: 768px) {
   .mobile-menu-toggle {
@@ -308,5 +697,61 @@ tr:hover {
   .chart-container,
   .recent-workouts {
     padding: 15px;
+  }
+
+  .footer-content {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+    padding: 2rem 1.5rem;
+  }
+
+  .footer-stats {
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .stat-item {
+    justify-content: center;
+  }
+
+  .social-icons {
+    justify-content: center;
+  }
+
+  .footer-section ul li a {
+    justify-content: flex-start;
+  }
+
+  .footer-bottom-content {
+    padding: 0 1rem;
+  }
+
+  .footer-links {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .footer-links span {
+    display: none;
+  }
+
+  .badges {
+    gap: 0.5rem;
+  }
+
+  .badge {
+    font-size: 0.75rem;
+    padding: 0.4rem 1rem;
+  }
+
+  .back-to-top {
+    width: 45px;
+    height: 45px;
+    bottom: 20px;
+    right: 20px;
+  }
+
+  .footer-wave svg {
+    height: 50px;
   }
 }

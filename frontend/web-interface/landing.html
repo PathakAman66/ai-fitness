@@ -109,36 +109,107 @@ pip install -r requirements/requirements.txt</code></pre>
         </div>
     </section>
 
+    <!-- Back to Top Button -->
+    <button id="backToTop" class="back-to-top" aria-label="Back to top">
+        <i class="fas fa-arrow-up"></i>
+    </button>
+
     <footer>
+        <div class="footer-wave">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 120">
+                <path fill="#2d2d2d" fill-opacity="1" d="M0,64L48,69.3C96,75,192,85,288,80C384,75,480,53,576,48C672,43,768,53,864,58.7C960,64,1056,64,1152,58.7C1248,53,1344,43,1392,37.3L1440,32L1440,120L1392,120C1344,120,1248,120,1152,120C1056,120,960,120,864,120C768,120,672,120,576,120C480,120,384,120,288,120C192,120,96,120,48,120L0,120Z"></path>
+            </svg>
+        </div>
+        
         <div class="footer-content">
             <div class="footer-section about">
-                <h3>🏋️ AI Fitness Trainer</h3>
-                <p>Your personal AI-powered fitness coach. Detects your form in real-time and provides instant feedback
-                    to help you workout safely and effectively.</p>
+                <h3><i class="fas fa-dumbbell"></i> AI Fitness Trainer</h3>
+                <p>Your personal AI-powered fitness coach that uses advanced computer vision to analyze your workout form in real-time. Train smarter, safer, and more effectively.</p>
+                <div class="footer-stats">
+                    <div class="stat-item">
+                        <i class="fas fa-users"></i>
+                        <span>10K+ Users</span>
+                    </div>
+                    <div class="stat-item">
+                        <i class="fas fa-running"></i>
+                        <span>50K+ Workouts</span>
+                    </div>
+                </div>
             </div>
 
-            <div class="footer-section connect">
-                <h3>Connect With Us</h3>
+            <div class="footer-section links">
+                <h3><i class="fas fa-link"></i> Quick Links</h3>
+                <ul>
+                    <li><a href="#home"><i class="fas fa-chevron-right"></i> Home</a></li>
+                    <li><a href="#features"><i class="fas fa-chevron-right"></i> Features</a></li>
+                    <li><a href="#how-it-works"><i class="fas fa-chevron-right"></i> How It Works</a></li>
+                    <li><a href="#get-started"><i class="fas fa-chevron-right"></i> Get Started</a></li>
+                    <li><a href="dashboard.html"><i class="fas fa-chevron-right"></i> Dashboard</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-section resources">
+                <h3><i class="fas fa-book"></i> Resources</h3>
+                <ul>
+                    <li><a href="https://github.com/Sappymukherjee214/ai-fitness" target="_blank"><i class="fas fa-chevron-right"></i> Documentation</a></li>
+                    <li><a href="https://github.com/Sappymukherjee214/ai-fitness/issues" target="_blank"><i class="fas fa-chevron-right"></i> Support</a></li>
+                    <li><a href="https://github.com/Sappymukherjee214/ai-fitness/blob/main/README.md" target="_blank"><i class="fas fa-chevron-right"></i> API Reference</a></li>
+                    <li><a href="#"><i class="fas fa-chevron-right"></i> Tutorial Videos</a></li>
+                    <li><a href="#"><i class="fas fa-chevron-right"></i> FAQs</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-section newsletter">
+                <h3><i class="fas fa-envelope"></i> Stay Updated</h3>
+                <p>Subscribe to get the latest updates and features!</p>
+                <form class="newsletter-form" onsubmit="event.preventDefault(); alert('Thanks for subscribing!');">
+                    <div class="input-group">
+                        <input type="email" placeholder="Enter your email" required>
+                        <button type="submit"><i class="fas fa-paper-plane"></i></button>
+                    </div>
+                </form>
                 <div class="social-links-footer">
-                    <a href="https://github.com/Suvam18" target="_blank" title="GitHub"><i
-                            class="fab fa-github"></i></a>
-                    <a href="https://www.linkedin.com/in/suvam-chatterjee-ba6b922b2?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=android_app"
-                        target="_blank" title="LinkedIn"><i class="fab fa-linkedin"></i></a>
-                    <a href="https://www.instagram.com/suv_am28/" target="_blank" title="Instagram"><i
-                            class="fab fa-instagram"></i></a>
-                    <a href="https://www.facebook.com" target="_blank" title="Facebook"><i
-                            class="fab fa-facebook"></i></a>
-                    <a href="https://twitter.com" target="_blank" title="Twitter"><i class="fab fa-twitter"></i></a>
+                    <h4>Connect With Us</h4>
+                    <div class="social-icons">
+                        <a href="https://github.com/Suvam18" target="_blank" title="GitHub" class="social-icon github">
+                            <i class="fab fa-github"></i>
+                        </a>
+                        <a href="https://www.linkedin.com/in/suvam-chatterjee-ba6b922b2?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=android_app"
+                            target="_blank" title="LinkedIn" class="social-icon linkedin">
+                            <i class="fab fa-linkedin"></i>
+                        </a>
+                        <a href="https://www.instagram.com/suv_am28/" target="_blank" title="Instagram" class="social-icon instagram">
+                            <i class="fab fa-instagram"></i>
+                        </a>
+                        <a href="https://www.facebook.com" target="_blank" title="Facebook" class="social-icon facebook">
+                            <i class="fab fa-facebook"></i>
+                        </a>
+                        <a href="https://twitter.com" target="_blank" title="Twitter" class="social-icon twitter">
+                            <i class="fab fa-twitter"></i>
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>
 
+        <div class="footer-divider"></div>
+
         <div class="footer-bottom">
-            <p>&copy; 2024 AI Fitness Trainer. Built with Python, OpenCV, and MediaPipe.</p>
+            <div class="footer-bottom-content">
+                <p>&copy; 2026 AI Fitness Trainer. All rights reserved. Built with <i class="fas fa-heart" style="color: #ff6b6b;"></i> using Python, OpenCV, and MediaPipe.</p>
+                <div class="footer-links">
+                    <a href="#">Privacy Policy</a>
+                    <span>•</span>
+                    <a href="#">Terms of Service</a>
+                    <span>•</span>
+                    <a href="#">Cookie Policy</a>
+                </div>
+            </div>
             <div class="badges">
-                <span class="badge">Python 3.8+</span>
-                <span class="badge">OpenCV 4.8</span>
-                <span class="badge">MediaPipe 0.10</span>
+                <span class="badge"><i class="fab fa-python"></i> Python 3.8+</span>
+                <span class="badge"><i class="fas fa-camera"></i> OpenCV 4.8</span>
+                <span class="badge"><i class="fas fa-brain"></i> MediaPipe 0.10</span>
+                <span class="badge"><i class="fas fa-rocket"></i> AI Powered</span>
             </div>
         </div>
     </footer>
@@ -185,6 +256,24 @@ pip install -r requirements/requirements.txt</code></pre>
                 } else {
                     header.classList.remove('scrolled');
                 }
+            });
+
+            // Back to top button functionality
+            const backToTopButton = document.getElementById('backToTop');
+            
+            window.addEventListener('scroll', function() {
+                if (window.scrollY > 300) {
+                    backToTopButton.classList.add('visible');
+                } else {
+                    backToTopButton.classList.remove('visible');
+                }
+            });
+
+            backToTopButton.addEventListener('click', function() {
+                window.scrollTo({
+                    top: 0,
+                    behavior: 'smooth'
+                });
             });
         });
     </script>
