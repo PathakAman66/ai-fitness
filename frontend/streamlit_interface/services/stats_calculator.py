@@ -235,3 +235,145 @@ class StatsCalculator:
             "best_quality": format_record(best_quality_session, best_quality, "quality_score"),
             "most_calories": format_record(most_calories_session, most_calories, "calories")
         }
+
+    @staticmethod
+    def get_recent_workouts(sessions: List[Dict], limit: int = 5) -> List[Dict]:
+        """
+        Get the most recent N workouts sorted by date descending.
+        
+        Args:
+            sessions: List of workout session dictionaries
+            limit: Number of sessions to return
+            
+        Returns:
+            List of session dictionaries sorted by time (newest first)
+        """
+        if not sessions:
+            return []
+            
+        # Sort sessions by start_time descending
+        sorted_sessions = sorted(
+            sessions, 
+            key=lambda x: x.get('start_time', ''), 
+            reverse=True
+        )
+        
+        return sorted_sessions[:limit]
+
+    @staticmethod
+    def calculate_current_streak(sessions: List[Dict]) -> int:
+        """
+        Calculate the current streak of consecutive days with workouts.
+        
+        Args:
+            sessions: List of workout session dictionaries
+            
+        Returns:
+            Number of consecutive days (including today)
+        """
+        if not sessions:
+            return 0
+            
+        # Get set of unique dates with workouts
+        workout_dates = set()
+        for session in sessions:
+            try:
+                timestamp = session.get('start_time', '')
+                dt = datetime.fromisoformat(timestamp.replace('Z', '+00:00'))
+                workout_dates.add(dt.date())
+            except (ValueError, AttributeError):
+                continue
+        
+        if not workout_dates:
+            return 0
+            
+        # Check streak counting backwards from today
+        streak = 0
+        today = datetime.now().date()
+        current_check = today
+        
+        # If no workout today, check if there was one yesterday to keep streak alive
+        if today not in workout_dates:
+            if (today - timedelta(days=1)) in workout_dates:
+                 current_check = today - timedelta(days=1)
+            else:
+                return 0 # No workout today or yesterday = 0 streak
+        
+        while current_check in workout_dates:
+            streak += 1
+            current_check -= timedelta(days=1)
+            
+        return streak
+
+    @staticmethod
+    def calculate_weekly_stats(sessions: List[Dict]) -> Dict[str, Any]:
+        """
+        Calculate statistics for the current week (starting Monday).
+        
+        Args:
+            sessions: List of workout session dictionaries
+            
+        Returns:
+            Dictionary containing weekly stats
+        """
+        now = datetime.now()
+        start_of_week = now - timedelta(days=now.weekday())
+        start_of_week = start_of_week.replace(hour=0, minute=0, second=0, microsecond=0)
+        
+        weekly_sessions = []
+        for session in sessions:
+            try:
+                timestamp = session.get('start_time', '')
+                dt = datetime.fromisoformat(timestamp.replace('Z', '+00:00'))
+                # Remove timezone info for comparison consistency
+                dt = dt.replace(tzinfo=None) 
+                if dt >= start_of_week:
+                    weekly_sessions.append(session)
+            except (ValueError, AttributeError):
+                continue
+                
+        return {
+            "count": len(weekly_sessions),
+            "calories": sum(s.get('calories', 0) for s in weekly_sessions),
+            "duration": sum(s.get('duration', 0) for s in weekly_sessions),
+            "reps": sum(s.get('reps', 0) for s in weekly_sessions)
+        }
+
+    @staticmethod
+    def calculate_calorie_trends(sessions: List[Dict]) -> List[Dict]:
+        """
+        Calculate average calories burned over time.
+        
+        Args:
+            sessions: List of workout session dictionaries
+            
+        Returns:
+            List of dictionaries with date and total calories
+        """
+        if not sessions:
+            return []
+        
+        # Group sessions by date and sum calories
+        daily_calories = defaultdict(float)
+        
+        for session in sessions:
+            try:
+                timestamp = session.get('start_time', '')
+                dt = datetime.fromisoformat(timestamp.replace('Z', '+00:00'))
+                date_key = dt.strftime("%Y-%m-%d")
+                
+                calories = session.get('calories', 0)
+                if isinstance(calories, (int, float)):
+                    daily_calories[date_key] += calories
+            except (ValueError, AttributeError):
+                continue
+        
+        # Format for chart
+        trends = []
+        for date_key in sorted(daily_calories.keys()):
+            trends.append({
+                "date": date_key,
+                "calories": round(daily_calories[date_key], 1)
+            })
+        
+        return trends

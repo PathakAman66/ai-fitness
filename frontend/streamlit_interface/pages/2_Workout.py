@@ -12,6 +12,8 @@ import cv2
 import numpy as np
 from datetime import datetime, timedelta
 import time
+import base64
+
 
 # Add parent directory to path for imports
 parent_dir = Path(__file__).parent.parent
@@ -1322,6 +1324,49 @@ def main():
     inject_custom_css()
     inject_material_icons_cdn()
     inject_hover_styles()
+
+    # Add HD fitness background
+    # Using an action shot of working out
+    bg_image_url = "https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?q=80&w=1920&auto=format&fit=crop"
+    
+    st.markdown(
+        f"""
+        <style>
+        /* Force Main Background Override */
+        [data-testid="stAppViewContainer"] {{
+            background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), 
+                url('{bg_image_url}') !important;
+            background-size: cover !important;
+            background-position: center !important;
+            background-attachment: fixed !important;
+            background-repeat: no-repeat !important;
+        }}
+        
+        /* Also target .stApp as a fallback */
+        .stApp {{
+            background: transparent !important;
+        }}
+        
+        /* Card Styling Enhancement - FORCE SOLID - BROAD SELECTOR */
+        div[data-testid="stVerticalBlockBorderWrapper"],
+        div[class*="stVerticalBlockBorderWrapper"],
+        div[data-testid="stVerticalBlock"] > div[style*="border"] {{
+            background-color: #1e293b !important; /* Solid Slate 800 */
+            border: 2px solid #3b82f6 !important; /* Blue Border */
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5) !important;
+            border-radius: 0.75rem !important;
+            margin-bottom: 20px !important;
+            padding: 20px !important;
+        }}
+        
+        /* Header Styling */
+        h1, h2, h3, p, div {{
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+        }}
+        </style>
+        """,
+        unsafe_allow_html=True
+    )
     
     # Initialize session state
     StateManager.initialize_all()
@@ -1349,40 +1394,6 @@ def main():
         render_exercise_selection()
         
         # Footer
-        # Add classic fitness background
-        st.markdown(
-            """
-            <style>
-            /* Main Background */
-            .stApp {
-                background-image: linear-gradient(rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.8)), 
-                    url('https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=1470&auto=format&fit=crop');
-                background-size: cover;
-                background-position: center;
-                background-attachment: fixed;
-            }
-            
-            /* Card Styling Enhancement - FORCE SOLID - BROAD SELECTOR */
-            div[data-testid="stVerticalBlockBorderWrapper"],
-            div[class*="stVerticalBlockBorderWrapper"],
-            div[data-testid="stVerticalBlock"] > div[style*="border"] {
-                background-color: #1e293b !important; /* Solid Slate 800 */
-                border: 2px solid #3b82f6 !important; /* Blue Border */
-                box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5) !important;
-                border-radius: 0.75rem !important;
-                margin-bottom: 20px !important;
-                padding: 20px !important;
-            }
-            
-            /* Header Styling */
-            h1, h2, h3, p, div {
-                text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
-            }
-            </style>
-            """,
-            unsafe_allow_html=True
-        )
-
         st.markdown(
             """
             <div style="text-align: center; padding: 2rem 0; margin-bottom: 2rem;">

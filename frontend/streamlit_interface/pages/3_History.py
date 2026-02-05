@@ -30,6 +30,20 @@ from services.workout_aggregator import WorkoutHistoryAggregator
 from utils.error_handler import ErrorHandler
 
 
+def inject_history_background():
+    """Inject specific background image for the History page."""
+    st.markdown(
+        """
+        <script>
+        document.body.classList.add('history-page-background');
+        </script>
+        """,
+        unsafe_allow_html=True
+    )
+
+
+
+
 def load_workout_sessions():
     """Load workout sessions from the backend data directory."""
     # Use cached sessions if available
@@ -342,7 +356,9 @@ def main():
     # Inject custom CSS and Material Icons
     inject_custom_css()
     inject_material_icons_cdn()
-    # inject_hover_styles removed as styles are now in custom_css
+    
+    # Inject page-specific background
+    inject_history_background()
     
     # Initialize session state
     StateManager.initialize_all()
@@ -401,4 +417,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-

@@ -596,6 +596,17 @@ def get_custom_css() -> str:
         border-radius: 12px;
         font-size: 0.75rem;
     }}
+    
+    /* History Page Specific Background */
+    .history-page-background [data-testid="stAppViewContainer"] {{
+        background: {COLORS['background']} !important;
+        background-image: linear-gradient(rgba(15, 23, 42, 0.85), rgba(15, 23, 42, 0.9)), 
+                          url('https://images.unsplash.com/photo-1540497077202-09f96303b309?q=80&w=1470&auto=format&fit=crop') !important;
+        background-size: cover !important;
+        background-position: center !important;
+        background-repeat: no-repeat !important;
+        background-attachment: fixed !important;
+    }}
     </style>
     """
     return css

@@ -825,6 +825,211 @@ def render_performance_trends(sessions):
                     )
 
 
+
+
+
+
+def render_personal_records(sessions):
+    """Render personal best records with animations."""
+    bests = StatsCalculator.identify_personal_bests(sessions)
+    
+    # If no data, don't render anything
+    if not bests['max_reps'] and not bests['longest_duration'] and not bests['best_quality']:
+        return
+
+    st.markdown(
+        f"""
+        <div style="margin-top: {SPACING['2xl']}; margin-bottom: {SPACING['lg']}; animation: fadeInUp 0.8s ease-out;">
+            <h3 style="
+                font-family: {TYPOGRAPHY['font_family_primary']};
+                font-size: {TYPOGRAPHY['font_size_xl']};
+                font-weight: {TYPOGRAPHY['font_weight_semibold']};
+                color: {COLORS['text_primary']};
+                display: flex;
+                align-items: center;
+                gap: 10px;
+            ">
+                <span style="font-size: 1.5rem;">🏆</span> Personal Records
+            </h3>
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
+    
+    col1, col2, col3 = st.columns(3)
+    
+    # Max Reps
+    with col1:
+        record = bests.get('max_reps')
+        if record:
+            exercise = record.get('exercise', 'Unknown').replace('_', ' ').title()
+            value = record.get('value', 0)
+            date = record.get('date', 'Unknown')
+            
+            st.markdown(
+                f"""
+                <div class="metric-card animated-card" style="
+                    padding: {SPACING['lg']}; 
+                    text-align: center; 
+                    background: rgba(15, 23, 42, 0.4);
+                    border-radius: {BORDER_RADIUS['lg']};
+                    animation-delay: 0.1s;
+                ">
+                    <div style="font-size: 2rem; margin-bottom: 0.5rem;">💪</div>
+                    <div style="color: {COLORS['text_secondary']}; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px;">Max Reps</div>
+                    <div style="font-size: 1.8rem; font-weight: 800; color: {COLORS['text_primary']}; margin: 0.5rem 0;">
+                        {value}
+                    </div>
+                    <div style="font-size: 0.85rem; color: {COLORS['primary']}; font-weight: 600;">
+                        {exercise}
+                    </div>
+                    <div style="font-size: 0.75rem; color: {COLORS['text_tertiary']}; margin-top: 0.25rem;">
+                        {date}
+                    </div>
+                </div>
+                """,
+                unsafe_allow_html=True
+            )
+            
+    # Longest Duration
+    with col2:
+        record = bests.get('longest_duration')
+        if record:
+            exercise = record.get('exercise', 'Unknown').replace('_', ' ').title()
+            value = record.get('value', 0)
+            date = record.get('date', 'Unknown')
+            minutes = int(value // 60)
+            seconds = int(value % 60)
+            
+            st.markdown(
+                f"""
+                <div class="metric-card animated-card" style="
+                    padding: {SPACING['lg']}; 
+                    text-align: center; 
+                    background: rgba(15, 23, 42, 0.4);
+                    border-radius: {BORDER_RADIUS['lg']};
+                    animation-delay: 0.2s;
+                ">
+                    <div style="font-size: 2rem; margin-bottom: 0.5rem;">⏱️</div>
+                    <div style="color: {COLORS['text_secondary']}; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px;">Longest Session</div>
+                    <div style="font-size: 1.8rem; font-weight: 800; color: {COLORS['text_primary']}; margin: 0.5rem 0;">
+                        {minutes}m {seconds}s
+                    </div>
+                    <div style="font-size: 0.85rem; color: {COLORS['primary']}; font-weight: 600;">
+                        {exercise}
+                    </div>
+                    <div style="font-size: 0.75rem; color: {COLORS['text_tertiary']}; margin-top: 0.25rem;">
+                        {date}
+                    </div>
+                </div>
+                """,
+                unsafe_allow_html=True
+            )
+
+    # Best Quality
+    with col3:
+        record = bests.get('best_quality')
+        if record:
+            exercise = record.get('exercise', 'Unknown').replace('_', ' ').title()
+            value = record.get('value', 0)
+            date = record.get('date', 'Unknown')
+            
+            st.markdown(
+                f"""
+                <div class="metric-card animated-card" style="
+                    padding: {SPACING['lg']}; 
+                    text-align: center; 
+                    background: rgba(15, 23, 42, 0.4);
+                    border-radius: {BORDER_RADIUS['lg']};
+                    animation-delay: 0.3s;
+                ">
+                    <div style="font-size: 2rem; margin-bottom: 0.5rem;">⭐</div>
+                    <div style="color: {COLORS['text_secondary']}; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px;">Best Form</div>
+                    <div style="font-size: 1.8rem; font-weight: 800; color: {COLORS['text_primary']}; margin: 0.5rem 0;">
+                        {int(value)}%
+                    </div>
+                    <div style="font-size: 0.85rem; color: {COLORS['primary']}; font-weight: 600;">
+                        {exercise}
+                    </div>
+                    <div style="font-size: 0.75rem; color: {COLORS['text_tertiary']}; margin-top: 0.25rem;">
+                        {date}
+                    </div>
+                </div>
+                """,
+                unsafe_allow_html=True
+            )
+
+def render_weekly_summary(sessions):
+    """Render a summary of this week's activity."""
+    weekly_stats = StatsCalculator.calculate_weekly_stats(sessions)
+    streak = StatsCalculator.calculate_current_streak(sessions)
+    
+    st.markdown(
+        f"""
+        <div style="margin-top: {SPACING['xl']}; margin-bottom: {SPACING['lg']};">
+            <h3 style="
+                font-family: {TYPOGRAPHY['font_family_primary']};
+                font-size: {TYPOGRAPHY['font_size_xl']};
+                font-weight: {TYPOGRAPHY['font_weight_semibold']};
+                color: {COLORS['text_primary']};
+            ">
+                This Week's Progress
+            </h3>
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
+    
+    col1, col2, col3, col4 = st.columns(4)
+    
+    with col1:
+        st.metric("🔥 Current Streak", f"{streak} Days", delta=None)
+    with col2:
+        st.metric("🏋️ Workouts", f"{weekly_stats['count']}", delta="This Week")
+    with col3:
+        st.metric("⚡ Calories", f"{int(weekly_stats['calories'])}", delta="This Week")
+    with col4:
+        st.metric("⏱️ Activity", f"{int(weekly_stats['duration'] // 60)}m", delta="This Week")
+
+
+def render_calorie_chart(sessions):
+    """Render a line chart for calorie burn history."""
+    calorie_data = StatsCalculator.calculate_calorie_trends(sessions)
+    
+    if not calorie_data:
+        return
+        
+    dates = [d['date'] for d in calorie_data]
+    cals = [d['calories'] for d in calorie_data]
+    
+    # Format dates
+    formatted_dates = []
+    for d in dates:
+         try:
+            dt = datetime.strptime(d, "%Y-%m-%d")
+            formatted_dates.append(dt.strftime("%b %d"))
+         except:
+            formatted_dates.append(d)
+
+    chart_data = {
+        'x': formatted_dates,
+        'y': cals,
+        'name': 'Calories Burned'
+    }
+    
+    fig = ChartComponents.create_line_chart(
+        data=chart_data,
+        title="Calories Burned Over Time",
+        x_label="Date",
+        y_label="Calories",
+        show_legend=False,
+        height=400
+    )
+    fig.update_traces(line_color="#ef4444", fill='tozeroy') # Red color for calories
+    
+    st.plotly_chart(fig, use_container_width=True)
+
+
 def inject_hover_styles():
     """Inject CSS for hover effects on metric cards and dark mode support."""
     st.markdown(
@@ -845,6 +1050,28 @@ def inject_hover_styles():
                 --card-bg: #1f2937;
                 --border-color: #374151;
             }}
+        }}
+        
+        /* New Animations */
+        @keyframes fadeInUp {{
+            from {{
+                opacity: 0;
+                transform: translate3d(0, 20px, 0);
+            }}
+            to {{
+                opacity: 1;
+                transform: translate3d(0, 0, 0);
+            }}
+        }}
+
+        .animated-card {{
+            animation: fadeInUp 0.6s ease-out backwards;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }}
+        
+        .animated-card:hover {{
+            transform: translateY(-5px) scale(1.02);
+            box-shadow: 0 10px 25px -5px rgba(59, 130, 246, 0.4) !important;
         }}
         
         [data-testid="stAppViewContainer"][data-theme="dark"] {{
@@ -940,6 +1167,80 @@ def main():
     # Inject custom CSS and Material Icons
     inject_custom_css()
     inject_material_icons_cdn()
+    
+    # Add HD Stats background
+    # Using an alternative dark, cinematic gym background
+    bg_image_url = "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?q=80&w=1920&auto=format&fit=crop"
+    
+    st.markdown(
+        f"""
+        <style>
+        /* Force Main Background Override for Stats Page */
+        [data-testid="stAppViewContainer"] {{
+            background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), 
+                url('{bg_image_url}') !important;
+            background-size: cover !important;
+            background-position: center !important;
+            background-attachment: fixed !important;
+            background-repeat: no-repeat !important;
+        }}
+        
+        /* Fallback */
+        .stApp {{
+            background: transparent !important;
+        }}
+        
+        /* --- Premium Card Styling & Animations --- */
+        
+        /* Keyframes for entrance animation */
+        @keyframes slideInUp {{
+            from {{
+                transform: translate3d(0, 40px, 0);
+                opacity: 0;
+            }}
+            to {{
+                transform: translate3d(0, 0, 0);
+                opacity: 1;
+            }}
+        }}
+
+        /* Enhance metric cards with Glassmorphism & Animation */
+        .metric-card {{
+            background-color: rgba(15, 23, 42, 0.6) !important; /* Darker, semi-transparent slate */
+            backdrop-filter: blur(16px) !important;
+            -webkit-backdrop-filter: blur(16px) !important;
+            border: 1px solid rgba(255, 255, 255, 0.1) !important;
+            border-top: 1px solid rgba(255, 255, 255, 0.2) !important; /* Highlight on top */
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37) !important;
+            border-radius: 24px !important;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important; /* Bouncy transition */
+            animation: slideInUp 0.6s ease-out both;
+        }}
+        
+        /* Hover Effect - Lift & Glow */
+        .metric-card:hover {{
+            transform: translateY(-8px) scale(1.02) !important;
+            background-color: rgba(30, 41, 59, 0.8) !important;
+            border-color: rgba(59, 130, 246, 0.5) !important; /* Blue glow border */
+            box-shadow: 0 20px 40px -5px rgba(0, 0, 0, 0.6), 0 0 15px rgba(59, 130, 246, 0.3) !important; /* Blue glow shadow */
+        }}
+        
+        /* Stagger animations for cards if possible (CSS targeting nth-child is tricky with Streamlit structure but we can try generic delay) */
+        
+        /* Text Enhancements inside cards */
+        .metric-card div[style*="font-size: 4xl"] {{
+            background: linear-gradient(to right, #60a5fa, #a78bfa);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: 800 !important;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+        }}
+        
+        </style>
+        """,
+        unsafe_allow_html=True
+    )
+
     inject_hover_styles()
     
     # Initialize session state
@@ -969,6 +1270,9 @@ def main():
         # Render overview metrics
         render_overview_metrics(sessions)
         
+        # Render weekly summary
+        render_weekly_summary(sessions)
+        
         # Add divider
         st.markdown(
             f"""
@@ -984,6 +1288,22 @@ def main():
         
         # Render workout frequency chart
         render_workout_frequency_chart(sessions)
+        
+        # Add divider
+        st.markdown(
+            f"""
+            <div style="margin: {SPACING['3xl']} 0;">
+                <hr style="
+                    border: none;
+                    border-top: 1px solid {COLORS['border']};
+                ">
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
+        
+        # Render calorie trend chart
+        render_calorie_chart(sessions)
         
         # Add divider
         st.markdown(
@@ -1017,30 +1337,17 @@ def main():
         # Render performance trends
         render_performance_trends(sessions)
         
+        # Render personal records
+        render_personal_records(sessions)
+        
+
+        
         # Remove the placeholder message since we now have performance trends
         # (The "More detailed statistics coming soon" message)
     
     # Footer
-    st.markdown(
-        f"""
-        <div style="
-            text-align: center;
-            padding: {SPACING['3xl']} {SPACING['lg']} {SPACING['xl']};
-            margin-top: {SPACING['4xl']};
-            border-top: 1px solid {COLORS['border']};
-        ">
-            <p style="
-                font-family: {TYPOGRAPHY['font_family_primary']};
-                font-size: {TYPOGRAPHY['font_size_sm']};
-                color: {COLORS['text_tertiary']};
-                margin: 0;
-            ">
-                AI Fitness Trainer © 2024 | Track Your Progress
-            </p>
-        </div>
-        """,
-        unsafe_allow_html=True,
-    )
+    st.markdown("---")
+    st.caption("AI Fitness Trainer © 2024 | Track Your Progress")
 
 
 if __name__ == "__main__":
