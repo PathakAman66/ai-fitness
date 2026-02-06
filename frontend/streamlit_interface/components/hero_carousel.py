@@ -255,7 +255,7 @@ def render_hero_carousel():
                 <div class="content">
                     <h1>AI-Powered<br>Fitness</h1>
                     <p>Real-time pose detection and biomechanical analysis. Train smarter with intelligent feedback.</p>
-                    <a href="#" class="btn-cta">Get Started</a>
+                    <a href="?auth_action=signup" target="_self" class="btn-cta">Get Started</a>
                 </div>
             </div>
 
@@ -270,7 +270,7 @@ def render_hero_carousel():
                 <div class="content">
                     <h1>Perfect<br>Form</h1>
                     <p>Automatic rep counting with real-time form corrections. Build strength safely and effectively.</p>
-                    <a href="#" class="btn-cta">Start Workout</a>
+                    <a href="?nav=workout" target="_self" class="btn-cta">Start Workout</a>
                 </div>
             </div>
 
@@ -285,7 +285,7 @@ def render_hero_carousel():
                 <div class="content">
                     <h1>Track<br>Progress</h1>
                     <p>Monitor your performance metrics in real-time. Achieve your fitness goals faster.</p>
-                    <a href="#" class="btn-cta">View Stats</a>
+                    <a href="?nav=stats" target="_self" class="btn-cta">View Stats</a>
                 </div>
             </div>
 

@@ -159,6 +159,59 @@ class APIClient:
             cls._cache_health_check(False)
             return False
     
+    def login(self, username, password) -> Dict[str, Any]:
+        """Authenticate user"""
+        try:
+            response = self.session.post(f"{API_BASE_URL}/api/v1/auth/login", json={
+                "username": username,
+                "password": password
+            }, timeout=DEFAULT_TIMEOUT)
+            response.raise_for_status()
+            return response.json()
+        except requests.exceptions.RequestException as e:
+            logger.error(f"Login failed: {str(e)}")
+            return {"success": False, "message": "Connection error or invalid credentials"}
+
+    def signup(self, user_data: Dict[str, Any]) -> Dict[str, Any]:
+        """Register new user"""
+        try:
+            response = self.session.post(f"{API_BASE_URL}/api/v1/auth/signup", json=user_data, timeout=DEFAULT_TIMEOUT)
+            response.raise_for_status()
+            return response.json()
+        except requests.exceptions.RequestException as e:
+            logger.error(f"Signup failed: {str(e)}")
+            return {"success": False, "message": "Connection error or user already exists"}
+            
+    def get_exercises(self) -> List[Dict[str, Any]]:
+        """
+        Get a list of available exercises from the backend.
+        
+        Returns:
+            A list of dictionaries, each representing an exercise, or an empty list on failure.
+        """
+        try:
+            logger.info(f"Fetching available exercises from {API_BASE_URL}/api/v1/exercises")
+            response = self.session.get(
+                f"{API_BASE_URL}/api/v1/exercises",
+                timeout=DEFAULT_TIMEOUT
+            )
+            response.raise_for_status()
+            exercises = response.json()
+            logger.debug(f"Successfully fetched {len(exercises)} exercises.")
+            return exercises
+        except requests.exceptions.Timeout:
+            logger.error("Get exercises request timed out")
+            return []
+        except requests.exceptions.HTTPError as e:
+            logger.error(f"HTTP error fetching exercises: {e.response.status_code} - {e.response.text}")
+            return []
+        except requests.exceptions.RequestException as e:
+            logger.error(f"Request failed to fetch exercises: {str(e)}")
+            return []
+        except Exception as e:
+            logger.error(f"Unexpected error fetching exercises: {str(e)}")
+            return []
+    
     def start_session(self, exercise_type: str) -> Optional[str]:
         """
         Start a new workout session

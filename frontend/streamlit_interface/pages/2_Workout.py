@@ -28,6 +28,7 @@ from utils.icons import (
 )
 from utils.state_manager import StateManager
 from components.navigation import Navigation
+from components.auth_header import render_auth_header
 from services.api_client import APIClient, get_api_client
 from utils.error_handler import ErrorHandler
 
@@ -1344,6 +1345,9 @@ def main():
         layout="wide",
         initial_sidebar_state="expanded",
     )
+    
+    # Render global auth header
+    render_auth_header()
     
     # Inject custom CSS and Material Icons
     inject_custom_css()

@@ -23,6 +23,7 @@ from utils.icons import (
 )
 from utils.state_manager import StateManager
 from components.navigation import Navigation
+from components.auth_header import render_auth_header
 from services.workout_loader import WorkoutHistoryLoader
 from services.workout_filter import WorkoutHistoryFilter
 from services.workout_formatter import WorkoutHistoryFormatter
@@ -393,6 +394,9 @@ def main():
         layout="wide",
         initial_sidebar_state="expanded",
     )
+    
+    # Render global auth header
+    render_auth_header()
     
     # Inject custom CSS and Material Icons
     inject_custom_css()

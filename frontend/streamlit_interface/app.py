@@ -22,6 +22,7 @@ from styles.theme import COLORS, TYPOGRAPHY, SPACING
 from utils.icons import inject_material_icons_cdn
 from utils.state_manager import StateManager
 from services.api_client import APIClient
+from components.auth_header import render_auth_header
 
 
 def configure_page():
@@ -440,6 +441,9 @@ def main():
     """
     # Configure page settings
     configure_page()
+    
+    # Render global auth header
+    render_auth_header()
     
     # Inject Landing Page Background
     inject_landing_background()

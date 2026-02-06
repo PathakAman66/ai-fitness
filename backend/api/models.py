@@ -273,5 +273,24 @@ class HealthCheckResponse(BaseModel):
     """Response model for health check endpoint"""
     status: str = Field(..., description="Service health status")
     service: str = Field(..., description="Service name")
-    version: str = Field(..., description="API version")
     pose_detector_initialized: bool = Field(..., description="Whether pose detector is ready")
+
+# Auth Models
+class UserLogin(BaseModel):
+    username: str
+    password: str
+
+class UserCreate(BaseModel):
+    username: str
+    email: str
+    password: str
+    age: int
+    height: float
+    weight: float
+    gender: str
+    goal: str
+
+class AuthResponse(BaseModel):
+    success: bool
+    message: str
+    user: Optional[Dict] = None

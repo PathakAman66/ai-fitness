@@ -20,6 +20,7 @@ from utils.state_manager import StateManager
 from components.navigation import Navigation
 from components.hero_carousel import render_hero_carousel
 from components.footer import render_footer
+from components.auth_header import render_auth_header
 
 
 def get_base64_image(image_path):
@@ -49,6 +50,9 @@ def render_media(media_path):
 
 def main():
     """Main function to render the Home page."""
+    # Initialize session state first
+    StateManager.initialize_all()
+
     # Apply page configuration
     apply_page_config(
         page_title="Home - AI Fitness Trainer",
@@ -56,6 +60,22 @@ def main():
         layout="wide",
         initial_sidebar_state="expanded",
     )
+    
+    # Render global auth header
+    render_auth_header()
+
+    # Check for navigation triggers from carousel
+    if "nav" in st.query_params:
+        nav_target = st.query_params["nav"]
+        # Clear param
+        st.query_params.clear()
+        
+        if nav_target == "workout":
+            StateManager.set_current_page("workout")
+            st.switch_page("pages/2_Workout.py")
+        elif nav_target == "stats":
+            StateManager.set_current_page("stats")
+            st.switch_page("pages/4_Stats.py")
 
     # Inject custom CSS and Material Icons
     inject_custom_css()
@@ -64,8 +84,7 @@ def main():
     # Inject Home Page Background
     inject_home_background()
 
-    # Initialize session state
-    StateManager.initialize_all()
+
 
 
 def inject_home_background():

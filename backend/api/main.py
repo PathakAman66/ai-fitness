@@ -31,6 +31,8 @@ from backend.api.models import (
 from backend.api.pose_detector import EnhancedPoseDetector
 from backend.api.session_manager import SessionManager
 from backend.utils.image_processor import ImageProcessor
+from backend.api.auth_utils import UserManager
+from backend.api.models import UserLogin, UserCreate, AuthResponse
 
 # Configure logging
 logging.basicConfig(
@@ -264,6 +266,56 @@ async def startup_event():
 async def shutdown_event():
     """Cleanup on application shutdown"""
     logger.info("👋 AI Fitness Trainer API shutting down...")
+
+
+# ============================================================================
+# AUTHENTICATION ENDPOINTS
+# ============================================================================
+
+@app.post("/api/v1/auth/signup", response_model=AuthResponse, tags=["Authentication"])
+async def signup(user: UserCreate):
+    """Register a new user"""
+    success, message = UserManager.create_user(
+        username=user.username,
+        email=user.email,
+        password=user.password,
+        profile_data={
+            "age": user.age,
+            "height": user.height,
+            "weight": user.weight,
+            "gender": user.gender,
+            "goal": user.goal
+        }
+    )
+    if not success:
+        return AuthResponse(success=False, message=message)
+    
+    # Auto-login after signup
+    return AuthResponse(
+        success=True, 
+        message="Account created successfully",
+        user={
+            "username": user.username,
+            "email": user.email,
+            "profile": {
+                "age": user.age,
+                "height": user.height,
+                "weight": user.weight,
+                "gender": user.gender,
+                "goal": user.goal
+            }
+        }
+    )
+
+@app.post("/api/v1/auth/login", response_model=AuthResponse, tags=["Authentication"])
+async def login(credentials: UserLogin):
+    """Authenticate a user"""
+    success, user_data = UserManager.authenticate(credentials.username, credentials.password)
+    
+    if success:
+        return AuthResponse(success=True, message="Login successful", user=user_data)
+    else:
+        return AuthResponse(success=False, message="Invalid username or password")
 
 
 # ============================================================================
