@@ -61,8 +61,16 @@ def main():
         initial_sidebar_state="expanded",
     )
     
-    # Render global auth header
-    render_auth_header()
+    # Render sidebar auth buttons (at top of sidebar)
+    with st.sidebar:
+        from components.sidebar_auth import render_sidebar_auth, render_auth_modal_if_needed, render_chatbot_if_needed
+        render_sidebar_auth()
+    
+    # Render auth modal if needed (must be called outside sidebar)
+    from components.sidebar_auth import render_auth_modal_if_needed, render_chatbot_if_needed
+    render_auth_modal_if_needed()
+    render_chatbot_if_needed()
+    
 
     # Check for navigation triggers from carousel
     if "nav" in st.query_params:

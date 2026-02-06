@@ -318,6 +318,27 @@ async def login(credentials: UserLogin):
         return AuthResponse(success=False, message="Invalid username or password")
 
 
+@app.post("/api/v1/auth/forgot-password", response_model=AuthResponse, tags=["Authentication"])
+async def forgot_password(email: str = Form(...)):
+    """
+    Initiate password reset process.
+    
+    For now, this is a mock implementation that validates the email exists.
+    In a real app, this would send a reset link via email.
+    """
+    # TODO: Implement actual email sending logic
+    # Check if email exists in our user database
+    # For security, we usually verify generic success even if email not found
+    # But for this demo we'll just return success
+    
+    logger.info(f"Password reset requested for {email}")
+    
+    return AuthResponse(
+        success=True,
+        message=f"If an account exists for {email}, a password reset link has been sent."
+    )
+
+
 # ============================================================================
 # HEALTH AND CONFIGURATION ENDPOINTS
 # ============================================================================

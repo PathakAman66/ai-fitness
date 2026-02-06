@@ -1,0 +1,332 @@
+:root {
+    --primary: #3b82f6;
+    --primary-dark: #2563eb;
+    --accent: #8b5cf6;
+    --dark-bg: #0f172a;
+    --card-bg: rgba(30, 41, 59, 0.7);
+    --text-main: #f8fafc;
+    --text-muted: #94a3b8;
+    --border: rgba(255, 255, 255, 0.1);
+    --error: #ef4444;
+    --success: #22c55e;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Inter', sans-serif;
+    background-color: var(--dark-bg);
+    color: var(--text-main);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    overflow: hidden;
+}
+
+/* Background Animations */
+.circle {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(80px);
+    z-index: -1;
+    opacity: 0.5;
+    animation: float 10s infinite alternate;
+}
+
+.circle-1 {
+    width: 300px;
+    height: 300px;
+    background: var(--primary);
+    top: -50px;
+    left: -50px;
+}
+
+.circle-2 {
+    width: 400px;
+    height: 400px;
+    background: var(--accent);
+    bottom: -100px;
+    right: -100px;
+    animation-delay: -5s;
+}
+
+@keyframes float {
+    0% { transform: translate(0, 0); }
+    100% { transform: translate(30px, 30px); }
+}
+
+.auth-container {
+    perspective: 1000px;
+}
+
+.auth-card {
+    background: var(--card-bg);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 40px;
+    width: 400px;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+    position: relative;
+    overflow: hidden;
+    transition: height 0.3s ease;
+}
+
+.form-container {
+    transition: all 0.4s ease-in-out;
+}
+
+.hidden {
+    display: none;
+    opacity: 0;
+    transform: translateX(20px);
+}
+
+.header h2 {
+    margin: 0 0 8px 0;
+    font-size: 1.8rem;
+    background: linear-gradient(135deg, #fff, #94a3b8);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.header p {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    margin-bottom: 30px;
+}
+
+/* Form Elements */
+.input-group {
+    margin-bottom: 20px;
+}
+
+.input-group label {
+    display: block;
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    margin-bottom: 6px;
+}
+
+.input-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.input-wrapper .icon {
+    position: absolute;
+    left: 12px;
+    color: var(--text-muted);
+    font-size: 20px;
+}
+
+.input-wrapper input, .input-group select {
+    width: 100%;
+    padding: 12px 12px 12px 40px;
+    background: rgba(15, 23, 42, 0.6);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    color: var(--text-main);
+    font-size: 0.95rem;
+    transition: all 0.3s ease;
+    box-sizing: border-box;
+}
+
+.input-group select {
+    padding-left: 12px; /* Reset padding for select */
+}
+
+.input-wrapper input:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+    outline: none;
+}
+
+.toggle-password {
+    position: absolute;
+    right: 12px;
+    cursor: pointer;
+    color: var(--text-muted);
+    font-size: 20px;
+}
+
+.toggle-password:hover {
+    color: var(--text-main);
+}
+
+.row {
+    display: flex;
+    gap: 15px;
+}
+
+.actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+    font-size: 0.85rem;
+}
+
+.forgot-password {
+    color: var(--primary);
+    text-decoration: none;
+    transition: color 0.2s;
+}
+
+.forgot-password:hover {
+    color: var(--primary-dark);
+}
+
+/* Custom Checkbox */
+.checkbox-container {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    color: var(--text-muted);
+    user-select: none;
+}
+
+.checkbox-container input {
+    display: none;
+}
+
+.checkmark {
+    width: 18px;
+    height: 18px;
+    background-color: rgba(15, 23, 42, 0.6);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    margin-right: 8px;
+    position: relative;
+    transition: all 0.2s;
+}
+
+.checkbox-container input:checked ~ .checkmark {
+    background-color: var(--primary);
+    border-color: var(--primary);
+}
+
+.checkbox-container input:checked ~ .checkmark:after {
+    content: "";
+    position: absolute;
+    left: 5px;
+    top: 2px;
+    width: 4px;
+    height: 8px;
+    border: solid white;
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+}
+
+/* Button */
+.btn-primary {
+    width: 100%;
+    padding: 12px;
+    background: linear-gradient(135deg, var(--primary), var(--accent));
+    border: none;
+    border-radius: 10px;
+    color: white;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+    position: relative;
+    overflow: hidden;
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 20px -5px rgba(59, 130, 246, 0.4);
+}
+
+.btn-primary:active {
+    transform: translateY(0);
+}
+
+/* Loader */
+.loader {
+    display: none;
+    width: 20px;
+    height: 20px;
+    border: 2px solid #ffffff;
+    border-bottom-color: transparent;
+    border-radius: 50%;
+    animation: rotation 1s linear infinite;
+    margin: 0 auto;
+}
+
+@keyframes rotation {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.btn-primary.loading .btn-text {
+    display: none;
+}
+
+.btn-primary.loading .loader {
+    display: block;
+}
+
+.footer {
+    text-align: center;
+    margin-top: 20px;
+    font-size: 0.9rem;
+    color: var(--text-muted);
+}
+
+.footer a {
+    color: var(--primary);
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.message {
+    margin-top: 15px;
+    text-align: center;
+    font-size: 0.85rem;
+    min-height: 20px;
+}
+
+.message.error {
+    color: var(--error);
+}
+
+.message.success {
+    color: var(--success);
+}
+
+/* Toast */
+.toast {
+    visibility: hidden;
+    min-width: 250px;
+    background-color: #333;
+    color: #fff;
+    text-align: center;
+    border-radius: 8px;
+    padding: 16px;
+    position: fixed;
+    z-index: 1000;
+    left: 50%;
+    bottom: 30px;
+    transform: translateX(-50%);
+    font-size: 17px;
+}
+
+.toast.show {
+    visibility: visible;
+    animation: fadein 0.5s, fadeout 0.5s 2.5s;
+}
+
+@keyframes fadein {
+    from {bottom: 0; opacity: 0;}
+    to {bottom: 30px; opacity: 1;}
+}
+
+@keyframes fadeout {
+    from {bottom: 30px; opacity: 1;}
+    to {bottom: 0; opacity: 0;}
+}

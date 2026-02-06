@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Fitness Trainer | Authentication</title>
+    <link href="auth.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+</head>
+<body>
+    <div class="auth-container">
+        <!-- Floating background elements -->
+        <div class="circle circle-1"></div>
+        <div class="circle circle-2"></div>
+
+        <div class="auth-card" id="authCard">
+            <!-- Login Form -->
+            <div class="form-container login-form" id="loginForm">
+                <div class="header">
+                    <h2>Welcome Back</h2>
+                    <p>Enter your details to access your workout plan</p>
+                </div>
+                
+                <form id="loginFormElement">
+                    <div class="input-group">
+                        <label for="loginEmail">Email</label>
+                        <div class="input-wrapper">
+                            <span class="material-icons icon">email</span>
+                            <input type="text" id="loginUsername" placeholder="Username" required> <!-- Using username as per backend -->
+                        </div>
+                    </div>
+                    
+                    <div class="input-group">
+                        <label for="loginPassword">Password</label>
+                        <div class="input-wrapper">
+                            <span class="material-icons icon">lock</span>
+                            <input type="password" id="loginPassword" placeholder="Enter your password" required>
+                            <span class="material-icons toggle-password" onclick="togglePassword('loginPassword')">visibility</span>
+                        </div>
+                    </div>
+
+                    <div class="actions">
+                        <label class="checkbox-container">
+                            <input type="checkbox" id="rememberMe">
+                            <span class="checkmark"></span>
+                            Remember me
+                        </label>
+                        <a href="#" class="forgot-password" onclick="showForgotPassword()">Forgot Password?</a>
+                    </div>
+
+                    <button type="submit" class="btn-primary" id="loginBtn">
+                        <span class="btn-text">Log In</span>
+                        <div class="loader"></div>
+                    </button>
+                    
+                    <div class="message" id="loginMessage"></div>
+                </form>
+
+                <div class="footer">
+                    <p>Don't have an account? <a href="#" onclick="toggleAuthMode()">Sign Up</a></p>
+                </div>
+            </div>
+
+            <!-- Sign Up Form -->
+            <div class="form-container signup-form hidden" id="signupForm">
+                <div class="header">
+                    <h2>Create Account</h2>
+                    <p>Start your fitness journey today</p>
+                </div>
+                
+                <form id="signupFormElement">
+                    <div class="input-group">
+                        <label for="signupUsername">Username</label>
+                        <div class="input-wrapper">
+                            <span class="material-icons icon">person</span>
+                            <input type="text" id="signupUsername" placeholder="Choose a username" required>
+                        </div>
+                    </div>
+
+                    <div class="input-group">
+                        <label for="signupEmail">Email</label>
+                        <div class="input-wrapper">
+                            <span class="material-icons icon">email</span>
+                            <input type="email" id="signupEmail" placeholder="Enter your email" required>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="input-group">
+                            <label for="signupAge">Age</label>
+                            <input type="number" id="signupAge" placeholder="25" min="10" max="100" required>
+                        </div>
+                        <div class="input-group">
+                            <label for="signupGender">Gender</label>
+                            <select id="signupGender">
+                                <option value="Male">Male</option>
+                                <option value="Female">Female</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="input-group">
+                        <label for="signupPassword">Password</label>
+                        <div class="input-wrapper">
+                            <span class="material-icons icon">lock</span>
+                            <input type="password" id="signupPassword" placeholder="Create robust password" required>
+                            <span class="material-icons toggle-password" onclick="togglePassword('signupPassword')">visibility</span>
+                        </div>
+                        <div class="password-strength" id="passwordStrength"></div>
+                    </div>
+
+                    <button type="submit" class="btn-primary" id="signupBtn">
+                        <span class="btn-text">Sign Up</span>
+                        <div class="loader"></div>
+                    </button>
+                    
+                    <div class="message" id="signupMessage"></div>
+                </form>
+
+                <div class="footer">
+                    <p>Already have an account? <a href="#" onclick="toggleAuthMode()">Log In</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="toast"></div>
+
+    <script src="auth.js"></script>
+</body>
+</html>

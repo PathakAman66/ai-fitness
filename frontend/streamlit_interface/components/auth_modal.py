@@ -99,22 +99,20 @@ def auth_dialog(initial_mode="login"):
                 if new_username and email and new_password:
                     if new_password == confirm_password:
                         # Call Backend API
-                        user_data = {
-                            "username": new_username,
-                            "email": email,
-                            "password": new_password,
-                            "age": age,
-                            "height": height,
-                            "weight": weight,
-                            "gender": gender,
-                            "goal": fitness_goal
-                        }
-                        
-                        with st.spinner("Creating account..."):
-                            response = api_client.signup(user_data)
+                        with st.spinner("Creating your account..."):
+                            response = api_client.signup(
+                                username=new_username,
+                                email=email,
+                                password=new_password,
+                                age=age,
+                                height=height,
+                                weight=weight,
+                                gender=gender,
+                                fitness_goal=fitness_goal
+                            )
                         
                         if response.get("success"):
-                            st.success(f"Account created for {new_username}! Logging you in...")
+                            st.success(f"Account created! Welcome, {new_username}!")
                             st.session_state.user = response.get("user")
                             st.session_state.is_authenticated = True
                             st.session_state.show_auth_modal = False
@@ -123,7 +121,7 @@ def auth_dialog(initial_mode="login"):
                         else:
                             st.error(response.get("message", "Signup failed"))
                     else:
-                        st.error("Passwords do not match.")
+                        st.error("Passwords do not match!")
                 else:
                     st.error("Please fill in all required fields.")
 

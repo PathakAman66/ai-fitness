@@ -1,6 +1,5 @@
 import streamlit as st
 from styles.theme import COLORS, TYPOGRAPHY, SPACING, BORDER_RADIUS, SHADOWS
-from components.auth_modal import auth_dialog
 
 def render_auth_header():
     """
@@ -23,9 +22,8 @@ def render_auth_header():
         st.query_params.clear()
         st.rerun()
 
-    # Render the dialog if state is active
-    if st.session_state.show_auth_modal:
-        auth_dialog(initial_mode=st.session_state.auth_modal_tab)
+    # Note: The auth dialog is now rendered by render_auth_modal_if_needed() 
+    # to avoid duplicate dialog errors
 
     # If authenticated, show user profile instead of login buttons
     if st.session_state.get("is_authenticated", False):
@@ -47,33 +45,28 @@ def render_auth_header():
                 align-items: center;
                 gap: 10px;
                 background: rgba(15, 23, 42, 0.6);
-                padding: 6px 16px;
+                padding: 8px 20px;
                 border-radius: 20px;
                 border: 1px solid rgba(255, 255, 255, 0.1);
                 backdrop-filter: blur(10px);
             }}
-            .user-avatar {{
-                width: 32px;
-                height: 32px;
-                background: linear-gradient(135deg, {COLORS['primary']}, {COLORS['accent']});
-                border-radius: 50%;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                color: white;
-                font-weight: bold;
-                font-size: 14px;
+            .user-greeting {{
+                color: #94a3af;
+                font-family: {TYPOGRAPHY['font_family_primary']};
+                font-size: 0.85rem;
+                font-weight: 400;
+                margin-right: 4px;
             }}
             .user-name {{
                 color: #e2e8f0;
                 font-family: {TYPOGRAPHY['font_family_primary']};
-                font-size: 0.9rem;
-                font-weight: 500;
+                font-size: 0.95rem;
+                font-weight: 600;
             }}
             </style>
             <div class="auth-header-container">
                 <div class="user-profile">
-                    <div class="user-avatar">{username[0].upper()}</div>
+                    <span class="user-greeting">Hi,</span>
                     <span class="user-name">{username}</span>
                 </div>
             </div>
@@ -120,11 +113,11 @@ def render_auth_header():
         }}
 
         .auth-btn-login:hover {{
-            background: rgba(30, 41, 59, 0.8);
+            background: rgba(30, 41, 59, 0.9);
             color: #f8fafc;
-            transform: translateY(-2px);
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.2);
-            border-color: rgba(99, 102, 241, 0.4);
+            transform: translateY(-2px) scale(1.05);
+            box-shadow: 0 10px 20px -3px rgba(0, 0, 0, 0.3);
+            border-color: rgba(99, 102, 241, 0.5);
         }}
 
         .auth-btn-signup {{
@@ -135,9 +128,9 @@ def render_auth_header():
         }}
 
         .auth-btn-signup:hover {{
-            filter: brightness(1.1);
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(37, 99, 235, 0.5);
+            filter: brightness(1.2);
+            transform: translateY(-2px) scale(1.05);
+            box-shadow: 0 12px 30px rgba(37, 99, 235, 0.6);
         }}
         
         /* Mobile adjustment */
