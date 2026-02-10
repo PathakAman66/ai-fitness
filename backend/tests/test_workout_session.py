@@ -4,7 +4,6 @@ Tests session management, persistence, and data loading functionality
 """
 import pytest
 import os
-import json
 import tempfile
 import shutil
 from backend.api.workout_session import WorkoutSession

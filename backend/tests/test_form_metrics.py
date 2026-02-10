@@ -2,7 +2,6 @@
 Tests for form metric calculation in PoseQualityEvaluator
 Validates that calculate_form_metrics returns appropriate scores for each exercise
 """
-import pytest
 from backend.api.pose_quality_evaluator import PoseQualityEvaluator
 
 

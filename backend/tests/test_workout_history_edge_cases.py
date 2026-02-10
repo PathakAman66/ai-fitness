@@ -5,7 +5,6 @@ Tests Requirements: 1.3, 1.5, 2.5
 import json
 import os
 import tempfile
-import shutil
 from pathlib import Path
 import pytest
 import sys

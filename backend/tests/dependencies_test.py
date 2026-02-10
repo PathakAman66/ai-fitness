@@ -2,8 +2,6 @@
 Simple test for AI Fitness Trainer - Minimal dependencies
 """
 import cv2
-import sys
-import os
 
 def test_camera():
     """Test if camera works"""

@@ -2,7 +2,6 @@
 Unit tests for PoseQualityEvaluator
 Tests quality score calculation, threshold categorization, and history tracking
 """
-import pytest
 from backend.api.pose_quality_evaluator import PoseQualityEvaluator
 
 

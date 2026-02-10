@@ -2,7 +2,6 @@
 Unit tests for EnhancedExerciseAnalyzer
 Tests exercise analysis and rep counting functionality
 """
-import pytest
 from backend.api.exercise_analyzer import EnhancedExerciseAnalyzer
 
 
