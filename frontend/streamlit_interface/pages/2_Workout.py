@@ -9,10 +9,8 @@ import streamlit as st
 import sys
 from pathlib import Path
 import cv2
-import numpy as np
-from datetime import datetime, timedelta
+from datetime import datetime
 import time
-import base64
 
 
 # Add parent directory to path for imports
@@ -23,12 +21,9 @@ from styles.custom_css import inject_custom_css, apply_page_config
 from styles.theme import COLORS, TYPOGRAPHY, SPACING, BORDER_RADIUS, SHADOWS
 from utils.icons import (
     inject_material_icons_cdn,
-    render_exercise_card_icon,
-    get_icon_name,
 )
 from utils.state_manager import StateManager
 from components.navigation import Navigation
-from components.auth_header import render_auth_header
 from services.api_client import APIClient, get_api_client
 from utils.error_handler import ErrorHandler
 

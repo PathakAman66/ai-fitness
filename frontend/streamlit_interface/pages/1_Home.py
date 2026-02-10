@@ -20,7 +20,6 @@ from utils.state_manager import StateManager
 from components.navigation import Navigation
 from components.hero_carousel import render_hero_carousel
 from components.footer import render_footer
-from components.auth_header import render_auth_header
 
 
 def get_base64_image(image_path):

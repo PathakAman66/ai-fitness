@@ -19,12 +19,9 @@ from styles.custom_css import inject_custom_css, apply_page_config
 from styles.theme import COLORS, TYPOGRAPHY, SPACING, BORDER_RADIUS, SHADOWS
 from utils.icons import (
     inject_material_icons_cdn,
-    get_icon_name,
-    render_icon,
 )
 from utils.state_manager import StateManager
 from components.navigation import Navigation
-from components.auth_header import render_auth_header
 from components.charts import ChartComponents
 from services.workout_loader import WorkoutHistoryLoader
 from services.stats_calculator import StatsCalculator

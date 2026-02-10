@@ -1,5 +1,5 @@
 import streamlit as st
-from styles.theme import COLORS, TYPOGRAPHY, SPACING, BORDER_RADIUS, SHADOWS
+from styles.theme import COLORS, TYPOGRAPHY
 
 def render_auth_header():
     """
