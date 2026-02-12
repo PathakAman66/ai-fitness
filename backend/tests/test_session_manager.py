@@ -2,7 +2,6 @@
 Unit tests for SessionManager service class
 Tests session creation, retrieval, ending, and resetting functionality
 """
-import pytest
 import time
 from backend.api.session_manager import SessionManager, SessionData
 

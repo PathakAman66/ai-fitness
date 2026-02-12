@@ -2,10 +2,9 @@
 Unit tests for edge case handling in pose quality evaluation
 Tests no pose detected, missing metrics, and invalid configuration scenarios
 """
-import pytest
 import logging
 from backend.api.pose_quality_evaluator import PoseQualityEvaluator
-from backend.api.exercise_config import get_exercise_config, ExerciseConfig, ThresholdConfig
+from backend.api.exercise_config import get_exercise_config
 
 
 class TestEdgeCaseHandling:

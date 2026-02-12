@@ -3,7 +3,6 @@ Tests for global error handlers in FastAPI application
 
 Verifies that error responses follow consistent format and proper status codes.
 """
-import pytest
 from fastapi.testclient import TestClient
 from backend.api.main import app
 
