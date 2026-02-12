@@ -4,7 +4,6 @@ Provides 24/7 fitness assistance through an interactive chat interface
 """
 
 import streamlit as st
-from datetime import datetime
 
 @st.dialog("🤖 AI Fitness Assistant - 24/7 Help", width="large")
 def chatbot_dialog():

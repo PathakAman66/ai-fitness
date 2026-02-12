@@ -18,11 +18,9 @@ current_dir = Path(__file__).parent
 sys.path.insert(0, str(current_dir))
 
 from styles.custom_css import inject_custom_css, apply_page_config
-from styles.theme import COLORS, TYPOGRAPHY, SPACING
 from utils.icons import inject_material_icons_cdn
 from utils.state_manager import StateManager
 from services.api_client import APIClient
-from components.auth_header import render_auth_header
 
 
 def configure_page():

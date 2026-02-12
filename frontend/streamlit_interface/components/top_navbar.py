@@ -1,5 +1,4 @@
 import streamlit as st
-from styles.theme import COLORS
 
 def render_top_navbar(active_page="home"):
     """

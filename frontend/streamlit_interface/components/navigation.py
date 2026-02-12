@@ -7,7 +7,6 @@ and navigation state management using Streamlit's session_state.
 """
 
 import streamlit as st
-from typing import Optional
 import sys
 from pathlib import Path
 
@@ -16,7 +15,7 @@ parent_dir = Path(__file__).parent.parent
 if str(parent_dir) not in sys.path:
     sys.path.insert(0, str(parent_dir))
 
-from utils.icons import render_icon_with_text, get_icon_name
+from utils.icons import get_icon_name
 from styles.theme import COLORS, TYPOGRAPHY, SPACING, BORDER_RADIUS, TRANSITIONS
 
 

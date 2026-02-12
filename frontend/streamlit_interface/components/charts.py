@@ -5,9 +5,8 @@ This module provides reusable chart components using Plotly for data visualizati
 with consistent professional styling across the application.
 """
 
-from typing import Dict, List, Optional, Union
+from typing import Dict, List, Optional
 import plotly.graph_objects as go
-import plotly.express as px
 import sys
 from pathlib import Path
 
