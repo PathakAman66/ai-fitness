@@ -5,10 +5,7 @@ Handles image encoding/decoding and format conversion for pose detection
 import base64
 import numpy as np
 import cv2
-from typing import Optional
 from fastapi import UploadFile
-import io
-from PIL import Image
 
 
 class ImageProcessor:
