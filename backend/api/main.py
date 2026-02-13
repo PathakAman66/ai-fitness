@@ -458,7 +458,8 @@ async def get_exercises():
 async def detect_pose(
     image: Optional[str] = Form(None, description="Base64 encoded image string"),
     draw_landmarks: bool = Form(False, description="Whether to return annotated image with landmarks"),
-    file: Optional[UploadFile] = File(None, description="Uploaded image file")
+    file: Optional[UploadFile] = File(None, description="Uploaded image file"),
+    user: str = Depends(get_current_user)
 ):
     """
     Detect pose landmarks in an image.
@@ -597,7 +598,10 @@ async def detect_pose(
 # ============================================================================
 
 @app.post("/api/v1/analyze", response_model=AnalysisResponse, tags=["Exercise Analysis"])
-async def analyze_exercise(request: AnalysisRequest):
+async def analyze_exercise(
+    request: AnalysisRequest,
+    user: str = Depends(get_current_user)
+):
     """
     Analyze exercise form and count repetitions.
     
@@ -763,7 +767,10 @@ async def analyze_exercise(request: AnalysisRequest):
 # ============================================================================
 
 @app.post("/api/v1/sessions/start", response_model=SessionResponse, tags=["Session Management"])
-async def start_session(request: SessionStartRequest):
+async def start_session(
+    request: SessionStartRequest,
+    user: str = Depends(get_current_user)
+):
     """
     Start a new workout session.
     
@@ -831,7 +838,10 @@ async def start_session(request: SessionStartRequest):
 
 
 @app.post("/api/v1/sessions/{session_id}/end", response_model=SessionResponse, tags=["Session Management"])
-async def end_session(session_id: str = Depends(validate_session_id)):
+async def end_session(
+    session_id: str = Depends(validate_session_id),
+    user: str = Depends(get_current_user)
+):
     """
     End an active workout session.
     
@@ -907,7 +917,10 @@ async def end_session(session_id: str = Depends(validate_session_id)):
 
 
 @app.post("/api/v1/sessions/{session_id}/reset", response_model=SessionResetResponse, tags=["Session Management"])
-async def reset_session(session_id: str = Depends(validate_session_id)):
+async def reset_session(
+    session_id: str = Depends(validate_session_id),
+    user: str = Depends(get_current_user)
+):
     """
     Reset a session's state to initial values.
     
@@ -964,7 +977,8 @@ async def reset_session(session_id: str = Depends(validate_session_id)):
 async def get_sessions(
     user_id: Optional[str] = None,
     limit: int = Query(100, ge=1, le=1000, description="Maximum number of sessions to return"),
-    offset: int = Query(0, ge=0, description="Number of sessions to skip for pagination")
+    offset: int = Query(0, ge=0, description="Number of sessions to skip for pagination"),
+    user: str = Depends(get_current_user)
 ):
     """
     Get list of workout sessions with optional filtering and pagination.
@@ -1056,7 +1070,10 @@ async def get_sessions(
 
 
 @app.get("/api/v1/sessions/{session_id}", response_model=SessionResponse, tags=["Session Management"])
-async def get_session(session_id: str = Depends(validate_session_id)):
+async def get_session(
+    session_id: str = Depends(validate_session_id),
+    user: str = Depends(get_current_user)
+):
     """
     Get details of a specific workout session.
     
