@@ -5,6 +5,11 @@ Exposes pose detection, exercise analysis, and workout session management via RE
 from fastapi import FastAPI, HTTPException, UploadFile, File, Form, Path, Depends, Query
 from fastapi.middleware.cors import CORSMiddleware
 from typing import Optional
+import os
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
 import logging
 
 # Import models
