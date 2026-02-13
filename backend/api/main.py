@@ -2,7 +2,7 @@
 FastAPI Backend for AI Fitness Trainer
 Exposes pose detection, exercise analysis, and workout session management via REST API
 """
-from fastapi import FastAPI, HTTPException, UploadFile, File, Form, Path, Depends, Query
+from fastapi import FastAPI, HTTPException, UploadFile, File, Form, Path, Depends, Query, status
 from fastapi.middleware.cors import CORSMiddleware
 from typing import Optional
 import logging
@@ -30,6 +30,11 @@ from backend.api.pose_detector import EnhancedPoseDetector
 from backend.api.session_manager import SessionManager
 from backend.utils.image_processor import ImageProcessor
 from backend.api.auth_utils import UserManager
+
+# Authentication imports
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+import jwt
+from backend.api.auth_utils import SECRET_KEY, ALGORITHM
 from backend.api.models import UserLogin, UserCreate, AuthResponse
 
 # Configure logging
@@ -74,6 +79,36 @@ logger.info("FastAPI application initialized with CORS support")
 pose_detector: Optional[EnhancedPoseDetector] = None
 session_manager: Optional[SessionManager] = None
 pose_detector_initialized = False
+
+# ============================================================================
+# AUTHENTICATION DEPENDENCY
+# ============================================================================
+
+security = HTTPBearer()
+
+async def get_current_user(
+    credentials: HTTPAuthorizationCredentials = Depends(security)
+):
+    token = credentials.credentials
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        username = payload.get("sub")
+        if username is None:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Invalid token"
+            )
+        return username
+    except jwt.ExpiredSignatureError:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Token expired"
+        )
+    except jwt.InvalidTokenError:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid token"
+        )
 
 
 def validate_session_id(session_id: str = Path(..., description="UUID of the workout session")) -> str:
