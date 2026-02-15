@@ -147,6 +147,16 @@ from fastapi.responses import JSONResponse
 from fastapi.exceptions import RequestValidationError
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
+def create_error_response(error: str, detail: str, status_code: int):
+    return JSONResponse(
+        status_code=status_code,
+        content={
+            "error": error,
+            "detail": detail,
+            "status_code": status_code
+        }
+    )
+
 
 @app.exception_handler(StarletteHTTPException)
 async def http_exception_handler(request: Request, exc: StarletteHTTPException):
@@ -181,13 +191,10 @@ async def http_exception_handler(request: Request, exc: StarletteHTTPException):
         logger.error(f"HTTP {exc.status_code} error on {request.url.path}: {exc.detail}")
     
     # Return consistent error response
-    return JSONResponse(
-        status_code=exc.status_code,
-        content={
-            "error": error_category,
-            "detail": str(exc.detail),
-            "status_code": exc.status_code
-        }
+    return create_error_response(
+        error=error_category,
+        detail=str(exc.detail),
+        status_code=exc.status_code
     )
 
 
@@ -216,13 +223,10 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
     logger.warning(f"Validation error on {request.url.path}: {detail}")
     
     # Return consistent error response
-    return JSONResponse(
-        status_code=status.HTTP_400_BAD_REQUEST,
-        content={
-            "error": "Validation Error",
-            "detail": detail,
-            "status_code": 400
-        }
+    return create_error_response(
+        error="Validation Error",
+        detail=detail,
+        status_code=status.HTTP_400_BAD_REQUEST
     )
 
 
@@ -239,13 +243,10 @@ async def value_error_handler(request: Request, exc: ValueError):
     """
     logger.warning(f"ValueError on {request.url.path}: {str(exc)}")
     
-    return JSONResponse(
-        status_code=status.HTTP_400_BAD_REQUEST,
-        content={
-            "error": "Invalid Input",
-            "detail": str(exc),
-            "status_code": 400
-        }
+    return create_error_response(
+        error="Invalid Input",
+        detail=str(exc),
+        status_code=status.HTTP_400_BAD_REQUEST
     )
 
 
@@ -264,13 +265,10 @@ async def general_exception_handler(request: Request, exc: Exception):
     logger.error(f"Unhandled exception on {request.url.path}: {type(exc).__name__}: {str(exc)}", exc_info=True)
     
     # Return generic error response (don't expose internal details)
-    return JSONResponse(
-        status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-        content={
-            "error": "Internal Server Error",
-            "detail": "An unexpected error occurred. Please try again later.",
-            "status_code": 500
-        }
+    return create_error_response(
+        error="Internal Server Error",
+        detail="An unexpected error occurred. Please try again later.",
+        status_code=status.HTTP_500_INTERNAL_SERVER_ERROR
     )
 
 
