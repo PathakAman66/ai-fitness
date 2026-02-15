@@ -1,4 +1,5 @@
 import json
+import re
 from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Optional
@@ -60,6 +61,34 @@ class UserManager:
     @classmethod
     def create_user(cls, username, email, password, profile_data=None):
         users = cls._load_users()
+
+        # ==============================
+        # INPUT VALIDATION
+        # ==============================
+
+        # Validate username (min 3 chars, letters/numbers/underscore only)
+        if not username or len(username) < 3:
+            return False, "Username must be at least 3 characters long"
+
+        if not re.match(r"^[a-zA-Z0-9_]+$", username):
+            return False, "Username can only contain letters, numbers, and underscores"
+
+        # Validate email format
+        if not email or not re.match(r"^[^@\s]+@[^@\s]+\.[^@\s]+$", email):
+            return False, "Invalid email format"
+
+        # Validate password strength
+        if not password or len(password) < 8:
+            return False, "Password must be at least 8 characters long"
+
+        if not re.search(r"[A-Z]", password):
+            return False, "Password must contain at least one uppercase letter"
+
+        if not re.search(r"[a-z]", password):
+            return False, "Password must contain at least one lowercase letter"
+
+        if not re.search(r"\d", password):
+            return False, "Password must contain at least one number"
         
         # Check if username or email already exists
         if username in users:
